@@ -1,0 +1,33 @@
+// {
+//   // IntelliSense を使用して利用可能な属性を学べます。
+//   // 既存の属性の説明をホバーして表示します。
+//   // 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
+//   "version": "0.2.0",
+//   "configurations": [
+//     {
+//       "name": "Launch Package",
+//       "type": "go",
+//       "request": "launch",
+//       "mode": "auto",
+//       "program": "${fileDirname}"
+//     }
+//   ]
+// }
+
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "delv",
+      "type": "go",
+      "request": "attach", // attachは既存のプロセスに接続する
+      "mode": "remote", //デバッグのモードを指定する remoteはリモートデバッグを行う
+      "remotePath": "/app", // コンテナ内の作業ディレクトリ
+      "port": 2345,
+      "host": "localhost",
+      "cwd": "${workspaceFolder}/backend", // ローカルの作業ディレクトリ
+      "showLog": true, //デバッグログを表示するかどうかを指定する
+      "trace": "verbose", // デバッグログの詳細度を指定する
+    }
+  ]
+}

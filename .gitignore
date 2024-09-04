@@ -1,0 +1,12 @@
+backend/docker/postgres/pgdata/
+docker/postgres/pgdata/postmaster.pid
+docker/postgres/pgdata/
+backend/docker/pgadmin/pgadmin4.db
+backend/docker/pgadmin/sessions/
+backend/tmp/main
+backend/tmp/build-errors.log
+.DS_Store
+backend/tmp/build-output.log
+backend/.env
+tmp/build-errors.log
+backend/.env.test
