@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"gin-fleamarket/services"
+	"project/services"
 
 	"github.com/gin-gonic/gin"
 )

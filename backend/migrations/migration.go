@@ -1,16 +1,16 @@
 package main
 
 import (
-	"gin-fleamarket/infra"
+	"project/infra"
 	"log"
-	"gin-fleamarket/models"
+	"project/models"
 )
 
 func main() {
 	infra.Initialize()
 	db := infra.SetupDB()
 
-	if err := db.AutoMigrate(&models.Item{}, &models.User{}); err != nil {
+	if err := db.AutoMigrate(&models.Item{}); err != nil {
 		panic("failed to migrate")
 	}
 	log.Println("migration has been processed")

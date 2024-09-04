@@ -5,8 +5,8 @@ import (
 	"os"
 	"time"
 
-	"gin-fleamarket/models"
-	"gin-fleamarket/repositories"
+	"project/models"
+	"project/repositories"
 
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"

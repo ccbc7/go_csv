@@ -15,10 +15,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 
-	"gin-fleamarket/dto"
-	"gin-fleamarket/infra"
-	"gin-fleamarket/models"
-	"gin-fleamarket/services"
+	"project/dto"
+	"project/infra"
+	"project/models"
+	"project/services"
 )
 
 func TestMain(m *testing.M) {

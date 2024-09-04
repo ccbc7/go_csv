@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"gin-fleamarket/dto"
-	"gin-fleamarket/models"
+	"project/dto"
+	"project/models"
 
-	"gin-fleamarket/services"
+	"project/services"
 
 	"github.com/gin-gonic/gin"
 )

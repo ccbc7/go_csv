@@ -1,13 +1,13 @@
 package main
 
 import (
-	"gin-fleamarket/controllers"
-	"gin-fleamarket/infra"
-	"gin-fleamarket/middlewares"
+	"project/controllers"
+	"project/infra"
+	"project/middlewares"
 
-	// "gin-fleamarket/models"
-	"gin-fleamarket/repositories"
-	"gin-fleamarket/services"
+	// "project/models"
+	"project/repositories"
+	"project/services"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"

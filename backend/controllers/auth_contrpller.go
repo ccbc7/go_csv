@@ -3,9 +3,9 @@ package controllers
 import (
 	"net/http"
 
-	"gin-fleamarket/services"
+	"project/services"
 
-	"gin-fleamarket/dto"
+	"project/dto"
 	"github.com/gin-gonic/gin"
 )
 

@@ -1,9 +1,9 @@
 package services
 
 import (
-	"gin-fleamarket/dto"
-	"gin-fleamarket/models"
-	"gin-fleamarket/repositories"
+	"project/dto"
+	"project/models"
+	"project/repositories"
 )
 
 // インターフェースを定義
