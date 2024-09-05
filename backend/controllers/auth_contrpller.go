@@ -5,8 +5,8 @@ import (
 
 	"project/services"
 
-	"project/dto"
 	"github.com/gin-gonic/gin"
+	"project/dto"
 )
 
 type IAuthController interface {

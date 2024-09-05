@@ -48,9 +48,6 @@ func (c *itemController) FindById(ctx *gin.Context) {
 
 	userId := user.(*models.User).ID
 
-
-
-
 	// strconv.ParseUint()文字列を整数に変換, 10進数, 64ビット
 	itemId, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
 	if err != nil {
@@ -107,7 +104,6 @@ func (c *itemController) Update(ctx *gin.Context) {
 
 	userId := user.(*models.User).ID
 
-
 	itemId, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid id"})
@@ -135,7 +131,7 @@ func (c *itemController) Update(ctx *gin.Context) {
 
 // 削除
 func (c *itemController) Delete(ctx *gin.Context) {
-		user, exists := ctx.Get("user")
+	user, exists := ctx.Get("user")
 	if !exists {
 		ctx.AbortWithStatus(http.StatusUnauthorized)
 		return

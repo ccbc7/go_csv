@@ -2,12 +2,12 @@ package infra
 
 import (
 	"fmt"
-	"os"
 	"log"
+	"os"
 
 	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
 func SetupDB() *gorm.DB {
@@ -36,7 +36,7 @@ func SetupDB() *gorm.DB {
 		log.Println("Setup in memory database")
 	}
 	if err != nil {
-		panic ("failed to connect database")
+		panic("failed to connect database")
 	}
 
 	return db

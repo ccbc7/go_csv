@@ -24,7 +24,6 @@ func AuthMiddleware(authService services.IAuthService) gin.HandlerFunc {
 			return
 		}
 
-
 		tokenString := strings.TrimPrefix(header, "Bearer ")
 		// bearerを取り除いたトークンを取得し、ユーザーを取得
 		user, err := authService.GetUserFromToken(tokenString)

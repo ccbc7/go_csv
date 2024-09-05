@@ -1,8 +1,8 @@
 package main
 
 import (
-	"project/infra"
 	"log"
+	"project/infra"
 	"project/models"
 )
 
