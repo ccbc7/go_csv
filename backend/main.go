@@ -23,6 +23,11 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	authService := services.NewAuthService(authRepository)
 	authController := controllers.NewAuthController(authService)
 
+	csvRepository := repositories.NewCsvRepository(db)
+	filepath := "./data/sample_data_100000.csv"
+	csvService := services.NewCsvService(csvRepository, filepath)
+	csvController := controllers.NewCsvController(csvService)
+
 	// ルーターの作成
 	r := gin.Default()
 
@@ -33,6 +38,7 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	itemRouter := r.Group("/items")
 	itemRouterWithAuth := r.Group("/items", middlewares.AuthMiddleware(authService))
 	authRouter := r.Group("/auth")
+	csvRouter := r.Group("/csv")
 
 	// ルーティングの設定
 	itemRouter.GET("", itemController.FindAll)
@@ -44,6 +50,8 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 
 	authRouter.POST("/signup", authController.SignUp)
 	authRouter.POST("/login", authController.Login)
+
+	csvRouter.POST("/process", csvController.ProcessCsv)
 
 	return r
 }
