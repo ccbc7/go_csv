@@ -23,4 +23,3 @@ func (c *CsvController) ProcessCsv(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, gin.H{"message": "CSV processed successfully"})
 }
-
