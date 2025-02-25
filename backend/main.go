@@ -16,9 +16,15 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+
+	"project/docs"
+	// "github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func setupRouter(db *gorm.DB) *gin.Engine {
+
 	itemRepository := repositories.NewItemRepository(db)
 	itemService := services.NewItemService(itemRepository)
 	itemController := controllers.NewItemController(itemService)
@@ -35,8 +41,21 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	// ルーターの作成
 	r := gin.Default()
 
-	// CORSの設定
 	r.Use(cors.Default())
+
+	// Swaggerの設定
+	docs.SwaggerInfo.BasePath = "/api/v1"
+	v1 := r.Group("/api/v1")
+	{
+		eg := v1.Group("/")
+		{
+			eg.GET("/hello", controllers.HelloWorld)
+		}
+	}
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	// CORSの設定
+
+	r.GET("/", controllers.HelloWorld)
 
 	// ルーティンググループの作成
 	itemRouter := r.Group("/items")
@@ -60,9 +79,14 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	return r
 }
 
+// @title Swagger Example API
+// @version 1.0
+// @description This is a sample server for a pet store.
+// @BasePath /api/v1
+
 func main() {
 	seed := flag.Bool("seed", false, "Run the database seeders")
-  migrate := flag.Bool("migrate", false, "Run the database migrations")
+  // migrate := flag.Bool("migrate", false, "Run the database migrations")
 	flag.Parse()
 	// 初期化(環境変数の読み込み)
 	infra.Initialize()
