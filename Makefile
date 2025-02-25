@@ -21,3 +21,8 @@ b:
 	docker compose exec backend bash
 f:
 	docker compose exec frontend ash
+
+
+# マイグレーション＆シード
+seed:
+	docker-compose exec backend go run migrations/migration.go

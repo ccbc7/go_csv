@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"project/controllers"
 	"project/infra"
 	"project/middlewares"
@@ -8,6 +10,8 @@ import (
 	// "project/models"
 	"project/repositories"
 	"project/services"
+
+	"project/database/seeders"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -57,11 +61,21 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 }
 
 func main() {
+	seed := flag.Bool("seed", false, "Run the database seeders")
+  migrate := flag.Bool("migrate", false, "Run the database migrations")
+	flag.Parse()
 	// 初期化(環境変数の読み込み)
 	infra.Initialize()
 
 	// DB接続
 	db := infra.SetupDB()
+
+	if *seed {
+		seeders.SeedAll(db)
+		fmt.Println("Seeding completed")
+	} else {
+		fmt.Println("No operation specified")
+	}
 
 	// ルーターの設定 引数にDBを渡すことで、各レイヤー(サービス,リポジトリ,コントローラ)でDBを利用できる
 	r := setupRouter(db)
