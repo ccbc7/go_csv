@@ -9,7 +9,7 @@ services:
     volumes:
       - ./backend:/app
     depends_on:
-      - postgres
+      - db
   # frontend:
   #   build:
   #     context: ./frontend/
@@ -18,7 +18,7 @@ services:
   #     - ./frontend:/app
   #   ports:
   #     - 3000:3000
-  postgres:
+  db:
     image: postgres:16-alpine
     container_name: postgres
     ports:
@@ -27,10 +27,10 @@ services:
       - postgres-init:/docker-entrypoint-initdb.d
       - postgres-data:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB:  gin
+      POSTGRES_USER: ginuser
+      POSTGRES_PASSWORD: ginpassword
       POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
-      POSTGRES_DB: ${DB_NAME}
     hostname: postgres
     restart: always
     user: root
