@@ -23,6 +23,17 @@ func NewAuthController(service services.IAuthService) IAuthController {
 	return &AuthController{service: service}
 }
 
+// SignUp godoc
+//	@Summary		Create a new user
+//	@Description	Create a new user with the input payload
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			input	body		dto.SignupInput	true	"User info"
+//	@Success		201		{string}	string			"created"
+//	@Failure		400		{string}	string			"bad request"
+//	@Failure		500		{string}	string			"internal server error"
+//	@Router			/auth/signup [post]
 func (c *AuthController) SignUp(ctx *gin.Context) {
 	var input dto.SignupInput
 	if err := ctx.ShouldBindJSON(&input); err != nil {
@@ -39,6 +50,18 @@ func (c *AuthController) SignUp(ctx *gin.Context) {
 	ctx.Status(http.StatusCreated)
 }
 
+// Login godoc
+//	@Summary		Login
+//	@Description	Login with the input payload
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			input	body		dto.LoginInput	true	"User info"
+//	@Success		200		{string}	string			"token"
+//	@Failure		400		{string}	string			"bad request"
+//	@Failure		404		{string}	string			"user not found"
+//	@Failure		500		{string}	string			"internal server error"
+//	@Router			/auth/login [post]
 func (c *AuthController) Login(ctx *gin.Context) {
 	var input dto.LoginInput
 	if err := ctx.ShouldBindJSON(&input); err != nil {

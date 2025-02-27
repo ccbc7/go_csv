@@ -28,8 +28,17 @@ func NewItemController(service services.IItemService) ItemController {
 	return &itemController{service: service}
 }
 
-// サービスのFindAll()メソッドを呼び出し、結果をJSON形式で返す
+// FindAll godoc
+//
+//	@Summary		Get all items
+//	@Description	Get all items from the database
+//	@Tags			items
+//	@Produce		json
+//	@Success		200	{object}	models.Item
+//	@Failure		500
+//	@Router			/items [get]
 func (c *itemController) FindAll(ctx *gin.Context) {
+	// サービスのFindAll()メソッドを呼び出し、結果をJSON形式で返す
 	items, err := c.service.FindAll()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Unexpected error"})
@@ -38,8 +47,20 @@ func (c *itemController) FindAll(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"data": items})
 }
 
-// IDで商品を取得
+// FindById godoc
+//
+//	@Summary		Get item by ID
+//	@Description	Get item from the database by ID
+//	@Tags			items
+//	@Produce		json
+//	@Param			id	path	int	true	"Item ID"
+//	@Success		200
+//	@Failure		400
+//	@Failure		404
+//	@Failure		500
+//	@Router			/api/v1/items/{id} [get]\
 func (c *itemController) FindById(ctx *gin.Context) {
+	// IDで商品を取得
 	user, exists := ctx.Get("user")
 	if !exists {
 		ctx.AbortWithStatus(http.StatusUnauthorized)
@@ -66,9 +87,19 @@ func (c *itemController) FindById(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"data": item})
 }
 
-// 作成
+// Create godoc
+//
+//	@Summary		Create a new item
+//	@Description	Create a new item in the database
+//	@Tags			items
+//	@Accept			json
+//	@Produce		json
+//	@Param			item	body		dto.CreateItemInput	true	"Item information"	example({"name": "item1", "price": 100, "description": "This is item1"})
+//	@Success		201		{object}	models.Item
+//	@Failure		400
+//	@Failure		500
+//	@Router			/items [post]
 func (c *itemController) Create(ctx *gin.Context) {
-
 	// ユーザー情報を取得
 	user, exists := ctx.Get("user")
 	if !exists {
@@ -93,7 +124,20 @@ func (c *itemController) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, gin.H{"data": newItem})
 }
 
-// 更新
+// Update godoc
+//
+//	@Summary		Update an item
+//	@Description	Update an item in the database
+//	@Tags			items
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path	int					true	"Item ID"	default(1)
+//	@Param			item	body	dto.UpdateItemInput	true	"Item information"
+//	@Success		200
+//	@Failure		400
+//	@Failure		404
+//	@Failure		500
+//	@Router			/items/{id} [put]
 func (c *itemController) Update(ctx *gin.Context) {
 	//ユーザーを取得
 	user, exists := ctx.Get("user")
@@ -129,7 +173,18 @@ func (c *itemController) Update(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"data": updatedItem})
 }
 
-// 削除
+// Delete godoc
+//
+//	@Summary		Delete an item
+//	@Description	Delete an item in the database
+//	@Tags			items
+//	@Produce		json
+//	@Param			id	path		int	true	"Item ID"
+//	@Success		204	{object}	string
+//	@Failure		400
+//	@Failure		404
+//	@Failure		500
+//	@Router			/items/{id} [delete]
 func (c *itemController) Delete(ctx *gin.Context) {
 	user, exists := ctx.Get("user")
 	if !exists {
