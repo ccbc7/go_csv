@@ -16,9 +16,15 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+
+	"project/docs"
+
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func setupRouter(db *gorm.DB) *gin.Engine {
+
 	itemRepository := repositories.NewItemRepository(db)
 	itemService := services.NewItemService(itemRepository)
 	itemController := controllers.NewItemController(itemService)
@@ -35,34 +41,53 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	// ルーターの作成
 	r := gin.Default()
 
-	// CORSの設定
 	r.Use(cors.Default())
 
-	// ルーティンググループの作成
-	itemRouter := r.Group("/items")
-	itemRouterWithAuth := r.Group("/items", middlewares.AuthMiddleware(authService))
-	authRouter := r.Group("/auth")
-	csvRouter := r.Group("/csv")
+	// Swaggerの設定
+	docs.SwaggerInfo.BasePath = "/api/v1"
+	v1 := r.Group("/api/v1")
+	{
+		eg := v1.Group("/")
+		{
+			eg.GET("/hello", controllers.HelloWorld)
+		}
 
-	// ルーティングの設定
-	itemRouter.GET("", itemController.FindAll)
+		// ルーティンググループの作成
+		itemRouter := v1.Group("/items")
+		itemRouterWithAuth := v1.Group("/items", middlewares.AuthMiddleware(authService))
+		authRouter := v1.Group("/auth")
+		csvRouter := v1.Group("/csv")
 
-	itemRouterWithAuth.GET("/:id", itemController.FindById)
-	itemRouterWithAuth.POST("", itemController.Create)
-	itemRouterWithAuth.PUT("/:id", itemController.Update)
-	itemRouterWithAuth.DELETE("/:id", itemController.Delete)
+		// ルーティングの設定
+		itemRouter.GET("", itemController.FindAll)
 
-	authRouter.POST("/signup", authController.SignUp)
-	authRouter.POST("/login", authController.Login)
+		itemRouterWithAuth.GET("/:id", itemController.FindById)
+		itemRouterWithAuth.POST("", itemController.Create)
+		itemRouterWithAuth.PUT("/:id", itemController.Update)
+		itemRouterWithAuth.DELETE("/:id", itemController.Delete)
 
-	csvRouter.POST("/process", csvController.ProcessCsv)
+		authRouter.POST("/signup", authController.SignUp)
+		authRouter.POST("/login", authController.Login)
+
+		csvRouter.POST("/process", csvController.ProcessCsv)
+	}
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	// CORSの設定
+
+	r.GET("/", controllers.HelloWorld)
 
 	return r
 }
 
+//	@title			Swagger Example API
+//	@version		1.0
+//	@description	This is a sample server for a pet store.
+//	@BasePath		/api/v1
+
 func main() {
 	seed := flag.Bool("seed", false, "Run the database seeders")
-  migrate := flag.Bool("migrate", false, "Run the database migrations")
+	// migrate := flag.Bool("migrate", false, "Run the database migrations")
 	flag.Parse()
 	// 初期化(環境変数の読み込み)
 	infra.Initialize()
