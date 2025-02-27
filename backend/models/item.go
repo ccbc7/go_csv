@@ -1,12 +1,18 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"time"
+)
 
+// Item represents the item model
 type Item struct {
-	gorm.Model
-	Name        string `gorm:"not null"`
-	Price       uint   `gorm:"not null"`
-	Description string
-	SoldOut     bool `gorm:"not null,default:false"`
-	UserID      uint `gorm:"not null"`
+	ID          uint       `json:"id" gorm:"primaryKey"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
+	DeletedAt   *time.Time `json:"deleted_at,omitempty"`
+	Name        string     `json:"name" gorm:"not null"`
+	Price       uint       `json:"price" gorm:"not null"`
+	Description string     `json:"description"`
+	SoldOut     bool       `json:"sold_out" gorm:"not null,default:false"`
+	UserID      uint       `json:"user_id" gorm:"not null"`
 }
