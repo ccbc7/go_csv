@@ -26,3 +26,6 @@ f:
 # マイグレーション＆シード
 seed:
 	docker-compose exec backend go run migrations/migration.go
+
+api:
+	docker-compose run --rm backend swag init && docker-compose exec backend swag fmt
