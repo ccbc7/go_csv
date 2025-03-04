@@ -1,7 +1,7 @@
 package seeders
 
 import (
-	"project/models"
+	"project/internal/models"
 
 	"gorm.io/gorm"
 )

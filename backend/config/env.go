@@ -1,4 +1,4 @@
-package infra
+package config
 
 import (
 	"log"
@@ -8,7 +8,7 @@ import (
 
 // envファイルの読み込み
 func Initialize() {
-	err := godotenv.Load()
+	err := godotenv.Load("/app/.env")
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
