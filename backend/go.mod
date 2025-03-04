@@ -7,6 +7,7 @@ toolchain go1.24.0
 require (
 	github.com/gin-contrib/cors v1.7.2
 	github.com/gin-gonic/gin v1.10.0
+	github.com/go-gormigrate/gormigrate/v2 v2.1.3
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/joho/godotenv v1.5.1
 	github.com/stretchr/testify v1.10.0
@@ -16,7 +17,7 @@ require (
 	golang.org/x/crypto v0.35.0
 	gorm.io/driver/postgres v1.5.9
 	gorm.io/driver/sqlite v1.5.0
-	gorm.io/gorm v1.25.11
+	gorm.io/gorm v1.25.12
 )
 
 require (
