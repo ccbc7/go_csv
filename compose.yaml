@@ -9,6 +9,7 @@ services:
     volumes:
       - ./backend:/app
       - go-mod-cache:/go/pkg/mod # Goのモジュールキャッシュ用
+      - go-bin-cache:/go/bin # swaggerなどのバイナリキャッシュ用
     depends_on:
       - db
   # frontend:
@@ -40,3 +41,4 @@ volumes:
   postgres-init:
   postgres-data:
   go-mod-cache: # Goのモジュールキャッシュ用のボリューム定義
+  go-bin-cache: # Goのバイナリキャッシュ用のボリューム定義
