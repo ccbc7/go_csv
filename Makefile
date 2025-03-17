@@ -20,12 +20,24 @@ down:
 b:
 	docker compose exec backend bash
 f:
-	docker compose exec frontend ash
+	docker compose exec frontend sh
 
 
 # マイグレーション＆シード
 seed:
-	docker-compose exec backend go run migrations/migration.go
+	docker-compose run --rm backend go run database/migrations/migration.go
 
+# swaggoによるAPIドキュメントの生成&整形
 api:
-	docker-compose run --rm backend swag init && docker-compose exec backend swag fmt
+	docker-compose run --rm backend swag init -g cmd/project/main.go && docker-compose run --rm backend swag fmt
+
+# フォーマット（標準のgo fmtを使用）
+fmt:
+	docker-compose run --rm backend go fmt ./...
+
+# 静的解析（標準のgo vetを使用）
+vet:
+	docker-compose run --rm backend go vet ./...
+
+# フォーマットと静的解析を実行
+fix: fmt vet
