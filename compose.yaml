@@ -8,6 +8,7 @@ services:
       - 2345:2345
     volumes:
       - ./backend:/app
+      # 以下のパスを指定すると自動的にモジュールキャッシュとバイナリキャッシュが有効になる
       - go-mod-cache:/go/pkg/mod # Goのモジュールキャッシュ用
       - go-bin-cache:/go/bin # swaggerなどのバイナリキャッシュ用
     depends_on:
