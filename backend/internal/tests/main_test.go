@@ -15,9 +15,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 
-	"project/dto"
-	"project/infra"
+	"project/database"
+	"project/internal/dto"
 	"project/internal/models"
+	"project/internal/router"
 	"project/internal/services"
 )
 
@@ -56,13 +57,11 @@ func setupTestData(db *gorm.DB) {
 }
 
 func setup() *gin.Engine {
-	db := infra.SetupDB()
+	db := database.SetupDB()
 	db.AutoMigrate(&models.User{}, &models.Item{})
 
 	setupTestData(db)
-	router := setupRouter(db)
-
-	return router
+	return router.SetupRouter(db)
 }
 
 // t *testing.T はテストの状態と結果を報告するためのオブジェクト
