@@ -41,3 +41,7 @@ vet:
 
 # フォーマットと静的解析を実行
 fix: fmt vet
+
+# 依存関係の解決
+tidy:
+	docker-compose run --rm backend go mod tidy
