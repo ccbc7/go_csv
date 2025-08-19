@@ -9,7 +9,7 @@ import (
 	"project/config"
 	"project/database"
 	"project/database/seeders"
-	"project/ent"
+	"project/internal/ent"
 	"project/internal/router"
 
 	_ "github.com/lib/pq"
