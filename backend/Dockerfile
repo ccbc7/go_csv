@@ -1,8 +1,12 @@
 # ベースイメージを指定
 FROM golang:latest
 
-# tsなどのコマンドを使うため
-RUN apt-get update && apt-get install -y moreutils
+# tsコマンドはログのタイムスタンプを付与するために使用
+# curlコマンドはAtlas CLIのインストールに使用
+RUN apt-get update && apt-get install -y \
+    moreutils \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
 # タイムゾーンを設定
 ENV TZ=Asia/Tokyo
@@ -10,16 +14,18 @@ ENV TZ=Asia/Tokyo
 # コンテナ内の作業ディレクトリを設定
 WORKDIR /app
 
-# ホットリロードを実現するAirをインストール
-RUN go install github.com/air-verse/air@latest
+# 開発ツールのインストール
+RUN go install github.com/air-verse/air@latest \
+    && go install github.com/go-delve/delve/cmd/dlv@latest \
+    && go install entgo.io/ent/cmd/ent@latest
 
-# delveをインストール
-RUN go install github.com/go-delve/delve/cmd/dlv@latest
+# Atlas CLI をインストール（プリビルトバイナリ）
+RUN curl -sSf https://atlasgo.sh | sh -s -- -b /usr/local/bin
 
-# ローカルのソースコードをコンテナにコピー
+# ソースコードをコピー
 COPY . .
 
-# 必要なパッケージをインストール
+# Go Modules の依存解決
 RUN go mod download
 
 # 公開予定のコンテナのポートを明示
