@@ -45,3 +45,6 @@ fix: fmt vet
 # 依存関係の解決
 tidy:
 	docker-compose run --rm backend go mod tidy
+
+ent:
+	docker-compose run --rm backend ent generate --target ./internal/ent ./schema
