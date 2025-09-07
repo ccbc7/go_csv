@@ -8,6 +8,30 @@ import (
 	"project/ent"
 )
 
+// The ItemFunc type is an adapter to allow the use of ordinary
+// function as Item mutator.
+type ItemFunc func(context.Context, *ent.ItemMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ItemFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ItemMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ItemMutation", m)
+}
+
+// The MovieFunc type is an adapter to allow the use of ordinary
+// function as Movie mutator.
+type MovieFunc func(context.Context, *ent.MovieMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f MovieFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.MovieMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MovieMutation", m)
+}
+
 // The UserFunc type is an adapter to allow the use of ordinary
 // function as User mutator.
 type UserFunc func(context.Context, *ent.UserMutation) (ent.Value, error)
