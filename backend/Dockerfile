@@ -14,6 +14,9 @@ ENV TZ=Asia/Tokyo
 # コンテナ内の作業ディレクトリを設定
 WORKDIR /app
 
+# ディレクトリの権限を設定
+RUN chmod 777 /app
+
 # 開発ツールのインストール
 RUN go install github.com/air-verse/air@latest \
     && go install github.com/go-delve/delve/cmd/dlv@latest \
