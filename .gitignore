@@ -11,3 +11,5 @@ backend/.env
 tmp/build-errors.log
 backend/.env.test
 backend/data/
+.env
+.env
