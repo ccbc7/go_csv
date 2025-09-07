@@ -19,6 +19,8 @@ func (Movie) Fields() []ent.Field {
 		field.String("genre").Optional().Comment("ジャンル"),
 		field.String("director").Optional().Comment("監督"),
 		field.String("cast").Optional().Comment("キャスト"),
+		field.Time("release_date").Optional().Comment("公開日"),
+		// field.String("rating").Optional().Comment("評価"),
 	}
 }
 
