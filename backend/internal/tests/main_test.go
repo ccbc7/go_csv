@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -13,11 +14,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
-	"gorm.io/gorm"
 
-	"project/database"
 	"project/internal/dto"
-	"project/internal/models"
+	"project/internal/ent"
 	"project/internal/router"
 	"project/internal/services"
 )
@@ -35,33 +34,60 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func setupTestData(db *gorm.DB) {
-	items := []models.Item{
-		{Name: "テストアイテム1", Price: 1000, Description: "", SoldOut: false, UserID: 1},
-		{Name: "テストアイテム2", Price: 1000, Description: "テスト２", SoldOut: false, UserID: 1},
-		{Name: "テストアイテム3", Price: 1000, Description: "テスト３", SoldOut: false, UserID: 2},
-	}
+func setupTestData(client *ent.Client) {
+	// テスト用のユーザーを作成
+	user1, _ := client.User.Create().
+		SetName("テストユーザー1").
+		SetLoginID("test1@example.com").
+		SetPassword("test1pass").
+		Save(context.Background())
 
-	users := []models.User{
-		{Email: "test1@example.com", Password: "test1pass"},
-		{Email: "test2@example.com", Password: "test2pass"},
-	}
+	user2, _ := client.User.Create().
+		SetName("テストユーザー2").
+		SetLoginID("test2@example.com").
+		SetPassword("test2pass").
+		Save(context.Background())
 
-	for _, user := range users {
-		db.Create(&user)
-	}
+	// テスト用のアイテムを作成
+	client.Item.Create().
+		SetName("テストアイテム1").
+		SetPrice(1000).
+		SetDescription("").
+		SetSoldOut(false).
+		SetUserID(user1.ID).
+		Save(context.Background())
 
-	for _, item := range items {
-		db.Create(&item)
-	}
+	client.Item.Create().
+		SetName("テストアイテム2").
+		SetPrice(1000).
+		SetDescription("テスト２").
+		SetSoldOut(false).
+		SetUserID(user1.ID).
+		Save(context.Background())
+
+	client.Item.Create().
+		SetName("テストアイテム3").
+		SetPrice(1000).
+		SetDescription("テスト３").
+		SetSoldOut(false).
+		SetUserID(user2.ID).
+		Save(context.Background())
 }
 
 func setup() *gin.Engine {
-	db := database.SetupDB()
-	db.AutoMigrate(&models.User{}, &models.Item{})
+	// Entクライアントを作成
+	dsn := "host=localhost user=postgres password=password dbname=test_db port=5432 sslmode=disable"
+	client, err := ent.Open("postgres", dsn)
+	if err != nil {
+		log.Fatalf("failed opening connection to postgres: %v", err)
+	}
+	defer client.Close()
 
-	setupTestData(db)
-	return router.SetupRouter(db)
+	// スキーマを作成
+	client.Schema.Create(context.Background())
+
+	setupTestData(client)
+	return router.SetupRouter(client)
 }
 
 // t *testing.T はテストの状態と結果を報告するためのオブジェクト
@@ -79,7 +105,7 @@ func TestFindAll(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	// resの型を定義しているだけで、中身は空のmap
-	var res map[string][]models.Item
+	var res map[string][]ent.Item
 
 	// レスポンスのボディをJSON形式からresで定義した構造体に格納
 	json.Unmarshal(w.Body.Bytes(), &res)
@@ -124,7 +150,7 @@ func TestCreate(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	// レスポンスのボディを格納する変数を定義
-	var res map[string]models.Item
+	var res map[string]ent.Item
 
 	// レスポンスのボディをJSON形式からresで定義した構造体に格納
 	json.Unmarshal(w.Body.Bytes(), &res)
@@ -132,7 +158,7 @@ func TestCreate(t *testing.T) {
 	// アサーションを使ってテストの結果を確認
 	assert.Equal(t, http.StatusCreated, w.Code)
 
-	assert.Equal(t, uint(4), res["data"].ID)
+	assert.Equal(t, 4, res["data"].ID)
 }
 
 func TestCreateUnauthorized(t *testing.T) {
@@ -158,7 +184,7 @@ func TestCreateUnauthorized(t *testing.T) {
 	router.ServeHTTP(w, req)
 
 	// レスポンスのボディを格納する変数を定義
-	var res map[string]models.Item
+	var res map[string]ent.Item
 
 	// レスポンスのボディをJSON形式からresで定義した構造体に格納
 	json.Unmarshal(w.Body.Bytes(), &res)

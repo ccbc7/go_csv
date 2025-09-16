@@ -7,8 +7,7 @@ import (
 	"log"
 	"os"
 	"project/config"
-	"project/database"
-	"project/database/seeders"
+	"project/internal/database/seeders"
 	"project/internal/ent"
 	"project/internal/router"
 
@@ -27,25 +26,23 @@ func main() {
 	// 初期化(環境変数の読み込み)
 	config.Initialize()
 
-	// DB接続
-	db := database.SetupDB()
+	// Entクライアントの作成
+	dsn := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
+		os.Getenv("POSTGRES_HOST"),
+		os.Getenv("POSTGRES_USER"),
+		os.Getenv("POSTGRES_PASSWORD"),
+		os.Getenv("POSTGRES_DB"),
+		os.Getenv("POSTGRES_PORT"),
+	)
+	client, err := ent.Open("postgres", dsn)
+	if err != nil {
+		log.Fatalf("failed opening connection to postgres: %v", err)
+	}
+	defer client.Close()
 
 	if *migrate {
 		// Entのマイグレーションのみ実行して終了
-		// Postgres DSN は SetupDB と同じ環境変数から構築
-		dsn := fmt.Sprintf(
-			"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
-			os.Getenv("POSTGRES_HOST"),
-			os.Getenv("POSTGRES_USER"),
-			os.Getenv("POSTGRES_PASSWORD"),
-			os.Getenv("POSTGRES_DB"),
-			os.Getenv("POSTGRES_PORT"),
-		)
-		client, err := ent.Open("postgres", dsn)
-		if err != nil {
-			log.Fatalf("failed opening connection to postgres: %v", err)
-		}
-		defer client.Close()
 		if err := client.Schema.Create(context.Background()); err != nil {
 			log.Fatalf("failed creating schema resources: %v", err)
 		}
@@ -54,14 +51,13 @@ func main() {
 	}
 
 	if *seed {
-		seeders.SeedAll(db)
+		seeders.SeedAll(client)
 		fmt.Println("Seeding completed")
-	} else {
-		fmt.Println("No operation specified")
+		return
 	}
 
 	// ルーターの設定
-	r := router.SetupRouter(db)
+	r := router.SetupRouter(client)
 
 	r.Run(":8080")
 }

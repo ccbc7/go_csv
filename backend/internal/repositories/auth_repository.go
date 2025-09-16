@@ -1,44 +1,43 @@
 package repositories
 
 import (
+	"context"
 	"errors"
-	"project/internal/models"
 
-	"gorm.io/gorm"
+	"project/internal/ent"
+	"project/internal/ent/user"
 )
 
 type IAuthRepository interface {
-	CreateUser(user models.User) error
-	FindUser(email string) (*models.User, error)
+	CreateUser(name, loginID, password string) (*ent.User, error)
+	FindUser(loginID string) (*ent.User, error)
 }
 
 type AuthRepository struct {
-	db *gorm.DB
+	client *ent.Client
 }
 
-func NewAuthRepository(db *gorm.DB) IAuthRepository {
-	// この関数でインターフェースに則った構造体にアクセスできるようなる
-	return &AuthRepository{db: db}
+func NewAuthRepository(client *ent.Client) IAuthRepository {
+	return &AuthRepository{client: client}
 }
 
-func (r *AuthRepository) CreateUser(user models.User) error {
-	// ユーザーを作成
-	result := r.db.Create(&user)
-	if result.Error != nil {
-		return result.Error
-	}
-	return nil
+func (r *AuthRepository) CreateUser(name, loginID, password string) (*ent.User, error) {
+	return r.client.User.Create().
+		SetName(name).
+		SetLoginID(loginID).
+		SetPassword(password).
+		Save(context.Background())
 }
 
-func (r *AuthRepository) FindUser(email string) (*models.User, error) {
-	var user models.User
-	// メールアドレスでユーザーを検索
-	result := r.db.First(&user, "email = ?", email)
-	if result.Error != nil {
-		if result.Error.Error() == "record not found" {
+func (r *AuthRepository) FindUser(loginID string) (*ent.User, error) {
+	user, err := r.client.User.Query().
+		Where(user.LoginIDEQ(loginID)).
+		Only(context.Background())
+	if err != nil {
+		if ent.IsNotFound(err) {
 			return nil, errors.New("user not found")
 		}
-		return nil, result.Error
+		return nil, err
 	}
-	return &user, nil
+	return user, nil
 }

@@ -2,17 +2,17 @@ package services
 
 import (
 	"project/internal/dto"
-	"project/internal/models"
+	"project/internal/ent"
 	"project/internal/repositories"
 )
 
 // インターフェースを定義
 type IItemService interface {
-	FindAll() (*[]models.Item, error)
-	FindById(itemId uint, userId uint) (*models.Item, error)
-	Create(createItemInput dto.CreateItemInput, userId uint) (*models.Item, error)
-	Update(itemId uint, updateItemInput dto.UpdateItemInput, userId uint) (*models.Item, error)
-	Delete(itemId uint, userId uint) error
+	FindAll() ([]*ent.Item, error)
+	FindById(itemId int, userId int) (*ent.Item, error)
+	Create(createItemInput dto.CreateItemInput, userId int) (*ent.Item, error)
+	Update(itemId int, updateItemInput dto.UpdateItemInput, userId int) (*ent.Item, error)
+	Delete(itemId int, userId int) error
 }
 
 // 構造体を定義
@@ -26,54 +26,52 @@ func NewItemService(repository repositories.IItemRepository) IItemService {
 }
 
 // 全ての商品を取得
-func (s *ItemService) FindAll() (*[]models.Item, error) {
+func (s *ItemService) FindAll() ([]*ent.Item, error) {
 	return s.repository.FindAll()
 }
 
 // IDで商品を取得
-func (s *ItemService) FindById(itemId uint, userId uint) (*models.Item, error) {
+func (s *ItemService) FindById(itemId int, userId int) (*ent.Item, error) {
 	return s.repository.FindById(itemId, userId)
 }
 
 // 作成
-func (s *ItemService) Create(createItemInput dto.CreateItemInput, userId uint) (*models.Item, error) {
-	newItem := models.Item{
-		Name:        createItemInput.Name,
-		Price:       createItemInput.Price,
-		Description: createItemInput.Description,
-		SoldOut:     false,
-		UserID:      userId,
-	}
+func (s *ItemService) Create(createItemInput dto.CreateItemInput, userId int) (*ent.Item, error) {
 	// リポジトリ層のCreateメソッドを呼び出し、作成処理を行う
-	return s.repository.Create(newItem)
+	return s.repository.Create(createItemInput.Name, int(createItemInput.Price), createItemInput.Description, false, userId)
 }
 
 // 更新
-func (s *ItemService) Update(itemId uint, updateItemInput dto.UpdateItemInput, userId uint) (*models.Item, error) {
+func (s *ItemService) Update(itemId int, updateItemInput dto.UpdateItemInput, userId int) (*ent.Item, error) {
 	// IDとユーザーIDで商品を取得,ユーザは自分の商品のみ更新できる
 	targetItem, err := s.FindById(itemId, userId)
 	if err != nil {
 		return nil, err
 	}
 
+	name := targetItem.Name
+	price := targetItem.Price
+	description := targetItem.Description
+	soldOut := targetItem.SoldOut
+
 	if updateItemInput.Name != nil {
-		targetItem.Name = *updateItemInput.Name
+		name = *updateItemInput.Name
 	}
 	if updateItemInput.Price != nil {
-		targetItem.Price = *updateItemInput.Price
+		price = int(*updateItemInput.Price)
 	}
 	if updateItemInput.Description != nil {
-		targetItem.Description = *updateItemInput.Description
+		description = *updateItemInput.Description
 	}
 	if updateItemInput.SoldOut != nil {
-		targetItem.SoldOut = *updateItemInput.SoldOut
+		soldOut = *updateItemInput.SoldOut
 	}
 
 	// リポジトリ層のUpdateメソッドを呼び出し、更新処理を行う
-	return s.repository.Update(*targetItem)
+	return s.repository.Update(itemId, name, price, description, soldOut, userId)
 }
 
 // 削除
-func (s *ItemService) Delete(itemId uint, userId uint) error {
+func (s *ItemService) Delete(itemId int, userId int) error {
 	return s.repository.Delete(itemId, userId)
 }

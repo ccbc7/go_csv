@@ -11,28 +11,25 @@ var (
 	// ItemsColumns holds the columns for the "items" table.
 	ItemsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "price", Type: field.TypeInt},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "sold_out", Type: field.TypeBool, Default: false},
+		{Name: "user_id", Type: field.TypeInt},
 	}
 	// ItemsTable holds the schema information for the "items" table.
 	ItemsTable = &schema.Table{
 		Name:       "items",
 		Columns:    ItemsColumns,
 		PrimaryKey: []*schema.Column{ItemsColumns[0]},
-	}
-	// MoviesColumns holds the columns for the "movies" table.
-	MoviesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "title", Type: field.TypeString},
-		{Name: "description", Type: field.TypeString, Nullable: true},
-		{Name: "duration", Type: field.TypeInt},
-		{Name: "genre", Type: field.TypeString, Nullable: true},
-		{Name: "director", Type: field.TypeString, Nullable: true},
-		{Name: "cast", Type: field.TypeString, Nullable: true},
-	}
-	// MoviesTable holds the schema information for the "movies" table.
-	MoviesTable = &schema.Table{
-		Name:       "movies",
-		Columns:    MoviesColumns,
-		PrimaryKey: []*schema.Column{MoviesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "items_users_items",
+				Columns:    []*schema.Column{ItemsColumns[5]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
 	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
@@ -50,10 +47,10 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		ItemsTable,
-		MoviesTable,
 		UsersTable,
 	}
 )
 
 func init() {
+	ItemsTable.ForeignKeys[0].RefTable = UsersTable
 }

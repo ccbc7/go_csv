@@ -4,8 +4,10 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"project/internal/ent/item"
+	"project/internal/ent/user"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -18,6 +20,57 @@ type ItemCreate struct {
 	hooks    []Hook
 }
 
+// SetName sets the "name" field.
+func (_c *ItemCreate) SetName(v string) *ItemCreate {
+	_c.mutation.SetName(v)
+	return _c
+}
+
+// SetPrice sets the "price" field.
+func (_c *ItemCreate) SetPrice(v int) *ItemCreate {
+	_c.mutation.SetPrice(v)
+	return _c
+}
+
+// SetDescription sets the "description" field.
+func (_c *ItemCreate) SetDescription(v string) *ItemCreate {
+	_c.mutation.SetDescription(v)
+	return _c
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (_c *ItemCreate) SetNillableDescription(v *string) *ItemCreate {
+	if v != nil {
+		_c.SetDescription(*v)
+	}
+	return _c
+}
+
+// SetSoldOut sets the "sold_out" field.
+func (_c *ItemCreate) SetSoldOut(v bool) *ItemCreate {
+	_c.mutation.SetSoldOut(v)
+	return _c
+}
+
+// SetNillableSoldOut sets the "sold_out" field if the given value is not nil.
+func (_c *ItemCreate) SetNillableSoldOut(v *bool) *ItemCreate {
+	if v != nil {
+		_c.SetSoldOut(*v)
+	}
+	return _c
+}
+
+// SetUserID sets the "user_id" field.
+func (_c *ItemCreate) SetUserID(v int) *ItemCreate {
+	_c.mutation.SetUserID(v)
+	return _c
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (_c *ItemCreate) SetUser(v *User) *ItemCreate {
+	return _c.SetUserID(v.ID)
+}
+
 // Mutation returns the ItemMutation object of the builder.
 func (_c *ItemCreate) Mutation() *ItemMutation {
 	return _c.mutation
@@ -25,6 +78,7 @@ func (_c *ItemCreate) Mutation() *ItemMutation {
 
 // Save creates the Item in the database.
 func (_c *ItemCreate) Save(ctx context.Context) (*Item, error) {
+	_c.defaults()
 	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
@@ -50,8 +104,46 @@ func (_c *ItemCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (_c *ItemCreate) defaults() {
+	if _, ok := _c.mutation.SoldOut(); !ok {
+		v := item.DefaultSoldOut
+		_c.mutation.SetSoldOut(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (_c *ItemCreate) check() error {
+	if _, ok := _c.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Item.name"`)}
+	}
+	if v, ok := _c.mutation.Name(); ok {
+		if err := item.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Item.name": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.Price(); !ok {
+		return &ValidationError{Name: "price", err: errors.New(`ent: missing required field "Item.price"`)}
+	}
+	if v, ok := _c.mutation.Price(); ok {
+		if err := item.PriceValidator(v); err != nil {
+			return &ValidationError{Name: "price", err: fmt.Errorf(`ent: validator failed for field "Item.price": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.SoldOut(); !ok {
+		return &ValidationError{Name: "sold_out", err: errors.New(`ent: missing required field "Item.sold_out"`)}
+	}
+	if _, ok := _c.mutation.UserID(); !ok {
+		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "Item.user_id"`)}
+	}
+	if v, ok := _c.mutation.UserID(); ok {
+		if err := item.UserIDValidator(v); err != nil {
+			return &ValidationError{Name: "user_id", err: fmt.Errorf(`ent: validator failed for field "Item.user_id": %w`, err)}
+		}
+	}
+	if len(_c.mutation.UserIDs()) == 0 {
+		return &ValidationError{Name: "user", err: errors.New(`ent: missing required edge "Item.user"`)}
+	}
 	return nil
 }
 
@@ -78,6 +170,39 @@ func (_c *ItemCreate) createSpec() (*Item, *sqlgraph.CreateSpec) {
 		_node = &Item{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(item.Table, sqlgraph.NewFieldSpec(item.FieldID, field.TypeInt))
 	)
+	if value, ok := _c.mutation.Name(); ok {
+		_spec.SetField(item.FieldName, field.TypeString, value)
+		_node.Name = value
+	}
+	if value, ok := _c.mutation.Price(); ok {
+		_spec.SetField(item.FieldPrice, field.TypeInt, value)
+		_node.Price = value
+	}
+	if value, ok := _c.mutation.Description(); ok {
+		_spec.SetField(item.FieldDescription, field.TypeString, value)
+		_node.Description = value
+	}
+	if value, ok := _c.mutation.SoldOut(); ok {
+		_spec.SetField(item.FieldSoldOut, field.TypeBool, value)
+		_node.SoldOut = value
+	}
+	if nodes := _c.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   item.UserTable,
+			Columns: []string{item.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.UserID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	return _node, _spec
 }
 
@@ -99,6 +224,7 @@ func (_c *ItemCreateBulk) Save(ctx context.Context) ([]*Item, error) {
 	for i := range _c.builders {
 		func(i int, root context.Context) {
 			builder := _c.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*ItemMutation)
 				if !ok {

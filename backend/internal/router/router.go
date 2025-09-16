@@ -1,6 +1,7 @@
 package router
 
 import (
+	"project/internal/ent"
 	controllers "project/internal/handlers"
 	"project/internal/middlewares"
 	"project/internal/repositories"
@@ -10,21 +11,20 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"gorm.io/gorm"
 
 	"project/docs"
 )
 
-func SetupRouter(db *gorm.DB) *gin.Engine {
-	itemRepository := repositories.NewItemRepository(db)
+func SetupRouter(client *ent.Client) *gin.Engine {
+	itemRepository := repositories.NewItemRepository(client)
 	itemService := services.NewItemService(itemRepository)
 	itemController := controllers.NewItemController(itemService)
 
-	authRepository := repositories.NewAuthRepository(db)
+	authRepository := repositories.NewAuthRepository(client)
 	authService := services.NewAuthService(authRepository)
 	authController := controllers.NewAuthController(authService)
 
-	csvRepository := repositories.NewCsvRepository(db)
+	csvRepository := repositories.NewCsvRepository(client)
 	filepath := "./data/sample_data_100000.csv"
 	csvService := services.NewCsvService(csvRepository, filepath)
 	csvController := controllers.NewCsvController(csvService)

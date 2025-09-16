@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"project/internal/ent/item"
 	"project/internal/ent/predicate"
+	"project/internal/ent/user"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -27,9 +28,103 @@ func (_u *ItemUpdate) Where(ps ...predicate.Item) *ItemUpdate {
 	return _u
 }
 
+// SetName sets the "name" field.
+func (_u *ItemUpdate) SetName(v string) *ItemUpdate {
+	_u.mutation.SetName(v)
+	return _u
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (_u *ItemUpdate) SetNillableName(v *string) *ItemUpdate {
+	if v != nil {
+		_u.SetName(*v)
+	}
+	return _u
+}
+
+// SetPrice sets the "price" field.
+func (_u *ItemUpdate) SetPrice(v int) *ItemUpdate {
+	_u.mutation.ResetPrice()
+	_u.mutation.SetPrice(v)
+	return _u
+}
+
+// SetNillablePrice sets the "price" field if the given value is not nil.
+func (_u *ItemUpdate) SetNillablePrice(v *int) *ItemUpdate {
+	if v != nil {
+		_u.SetPrice(*v)
+	}
+	return _u
+}
+
+// AddPrice adds value to the "price" field.
+func (_u *ItemUpdate) AddPrice(v int) *ItemUpdate {
+	_u.mutation.AddPrice(v)
+	return _u
+}
+
+// SetDescription sets the "description" field.
+func (_u *ItemUpdate) SetDescription(v string) *ItemUpdate {
+	_u.mutation.SetDescription(v)
+	return _u
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (_u *ItemUpdate) SetNillableDescription(v *string) *ItemUpdate {
+	if v != nil {
+		_u.SetDescription(*v)
+	}
+	return _u
+}
+
+// ClearDescription clears the value of the "description" field.
+func (_u *ItemUpdate) ClearDescription() *ItemUpdate {
+	_u.mutation.ClearDescription()
+	return _u
+}
+
+// SetSoldOut sets the "sold_out" field.
+func (_u *ItemUpdate) SetSoldOut(v bool) *ItemUpdate {
+	_u.mutation.SetSoldOut(v)
+	return _u
+}
+
+// SetNillableSoldOut sets the "sold_out" field if the given value is not nil.
+func (_u *ItemUpdate) SetNillableSoldOut(v *bool) *ItemUpdate {
+	if v != nil {
+		_u.SetSoldOut(*v)
+	}
+	return _u
+}
+
+// SetUserID sets the "user_id" field.
+func (_u *ItemUpdate) SetUserID(v int) *ItemUpdate {
+	_u.mutation.SetUserID(v)
+	return _u
+}
+
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (_u *ItemUpdate) SetNillableUserID(v *int) *ItemUpdate {
+	if v != nil {
+		_u.SetUserID(*v)
+	}
+	return _u
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (_u *ItemUpdate) SetUser(v *User) *ItemUpdate {
+	return _u.SetUserID(v.ID)
+}
+
 // Mutation returns the ItemMutation object of the builder.
 func (_u *ItemUpdate) Mutation() *ItemMutation {
 	return _u.mutation
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (_u *ItemUpdate) ClearUser() *ItemUpdate {
+	_u.mutation.ClearUser()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -59,7 +154,33 @@ func (_u *ItemUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (_u *ItemUpdate) check() error {
+	if v, ok := _u.mutation.Name(); ok {
+		if err := item.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Item.name": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.Price(); ok {
+		if err := item.PriceValidator(v); err != nil {
+			return &ValidationError{Name: "price", err: fmt.Errorf(`ent: validator failed for field "Item.price": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.UserID(); ok {
+		if err := item.UserIDValidator(v); err != nil {
+			return &ValidationError{Name: "user_id", err: fmt.Errorf(`ent: validator failed for field "Item.user_id": %w`, err)}
+		}
+	}
+	if _u.mutation.UserCleared() && len(_u.mutation.UserIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "Item.user"`)
+	}
+	return nil
+}
+
 func (_u *ItemUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(item.Table, item.Columns, sqlgraph.NewFieldSpec(item.FieldID, field.TypeInt))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -67,6 +188,53 @@ func (_u *ItemUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.Name(); ok {
+		_spec.SetField(item.FieldName, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.Price(); ok {
+		_spec.SetField(item.FieldPrice, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedPrice(); ok {
+		_spec.AddField(item.FieldPrice, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.Description(); ok {
+		_spec.SetField(item.FieldDescription, field.TypeString, value)
+	}
+	if _u.mutation.DescriptionCleared() {
+		_spec.ClearField(item.FieldDescription, field.TypeString)
+	}
+	if value, ok := _u.mutation.SoldOut(); ok {
+		_spec.SetField(item.FieldSoldOut, field.TypeBool, value)
+	}
+	if _u.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   item.UserTable,
+			Columns: []string{item.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   item.UserTable,
+			Columns: []string{item.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -88,9 +256,103 @@ type ItemUpdateOne struct {
 	mutation *ItemMutation
 }
 
+// SetName sets the "name" field.
+func (_u *ItemUpdateOne) SetName(v string) *ItemUpdateOne {
+	_u.mutation.SetName(v)
+	return _u
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (_u *ItemUpdateOne) SetNillableName(v *string) *ItemUpdateOne {
+	if v != nil {
+		_u.SetName(*v)
+	}
+	return _u
+}
+
+// SetPrice sets the "price" field.
+func (_u *ItemUpdateOne) SetPrice(v int) *ItemUpdateOne {
+	_u.mutation.ResetPrice()
+	_u.mutation.SetPrice(v)
+	return _u
+}
+
+// SetNillablePrice sets the "price" field if the given value is not nil.
+func (_u *ItemUpdateOne) SetNillablePrice(v *int) *ItemUpdateOne {
+	if v != nil {
+		_u.SetPrice(*v)
+	}
+	return _u
+}
+
+// AddPrice adds value to the "price" field.
+func (_u *ItemUpdateOne) AddPrice(v int) *ItemUpdateOne {
+	_u.mutation.AddPrice(v)
+	return _u
+}
+
+// SetDescription sets the "description" field.
+func (_u *ItemUpdateOne) SetDescription(v string) *ItemUpdateOne {
+	_u.mutation.SetDescription(v)
+	return _u
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (_u *ItemUpdateOne) SetNillableDescription(v *string) *ItemUpdateOne {
+	if v != nil {
+		_u.SetDescription(*v)
+	}
+	return _u
+}
+
+// ClearDescription clears the value of the "description" field.
+func (_u *ItemUpdateOne) ClearDescription() *ItemUpdateOne {
+	_u.mutation.ClearDescription()
+	return _u
+}
+
+// SetSoldOut sets the "sold_out" field.
+func (_u *ItemUpdateOne) SetSoldOut(v bool) *ItemUpdateOne {
+	_u.mutation.SetSoldOut(v)
+	return _u
+}
+
+// SetNillableSoldOut sets the "sold_out" field if the given value is not nil.
+func (_u *ItemUpdateOne) SetNillableSoldOut(v *bool) *ItemUpdateOne {
+	if v != nil {
+		_u.SetSoldOut(*v)
+	}
+	return _u
+}
+
+// SetUserID sets the "user_id" field.
+func (_u *ItemUpdateOne) SetUserID(v int) *ItemUpdateOne {
+	_u.mutation.SetUserID(v)
+	return _u
+}
+
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (_u *ItemUpdateOne) SetNillableUserID(v *int) *ItemUpdateOne {
+	if v != nil {
+		_u.SetUserID(*v)
+	}
+	return _u
+}
+
+// SetUser sets the "user" edge to the User entity.
+func (_u *ItemUpdateOne) SetUser(v *User) *ItemUpdateOne {
+	return _u.SetUserID(v.ID)
+}
+
 // Mutation returns the ItemMutation object of the builder.
 func (_u *ItemUpdateOne) Mutation() *ItemMutation {
 	return _u.mutation
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (_u *ItemUpdateOne) ClearUser() *ItemUpdateOne {
+	_u.mutation.ClearUser()
+	return _u
 }
 
 // Where appends a list predicates to the ItemUpdate builder.
@@ -133,7 +395,33 @@ func (_u *ItemUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (_u *ItemUpdateOne) check() error {
+	if v, ok := _u.mutation.Name(); ok {
+		if err := item.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Item.name": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.Price(); ok {
+		if err := item.PriceValidator(v); err != nil {
+			return &ValidationError{Name: "price", err: fmt.Errorf(`ent: validator failed for field "Item.price": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.UserID(); ok {
+		if err := item.UserIDValidator(v); err != nil {
+			return &ValidationError{Name: "user_id", err: fmt.Errorf(`ent: validator failed for field "Item.user_id": %w`, err)}
+		}
+	}
+	if _u.mutation.UserCleared() && len(_u.mutation.UserIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "Item.user"`)
+	}
+	return nil
+}
+
 func (_u *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(item.Table, item.Columns, sqlgraph.NewFieldSpec(item.FieldID, field.TypeInt))
 	id, ok := _u.mutation.ID()
 	if !ok {
@@ -158,6 +446,53 @@ func (_u *ItemUpdateOne) sqlSave(ctx context.Context) (_node *Item, err error) {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.Name(); ok {
+		_spec.SetField(item.FieldName, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.Price(); ok {
+		_spec.SetField(item.FieldPrice, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedPrice(); ok {
+		_spec.AddField(item.FieldPrice, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.Description(); ok {
+		_spec.SetField(item.FieldDescription, field.TypeString, value)
+	}
+	if _u.mutation.DescriptionCleared() {
+		_spec.ClearField(item.FieldDescription, field.TypeString)
+	}
+	if value, ok := _u.mutation.SoldOut(); ok {
+		_spec.SetField(item.FieldSoldOut, field.TypeBool, value)
+	}
+	if _u.mutation.UserCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   item.UserTable,
+			Columns: []string{item.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.UserIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   item.UserTable,
+			Columns: []string{item.UserColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Item{config: _u.config}
 	_spec.Assign = _node.assignValues

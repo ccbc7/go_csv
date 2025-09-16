@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"project/internal/dto"
-	"project/internal/models"
+	"project/internal/ent"
 
 	"project/internal/services"
 
@@ -34,7 +34,7 @@ func NewItemController(service services.IItemService) ItemController {
 //	@Description	Get all items from the database
 //	@Tags			items
 //	@Produce		json
-//	@Success		200	{object}	models.Item
+//	@Success		200	{object}	ent.Item
 //	@Failure		500
 //	@Router			/items [get]
 func (c *itemController) FindAll(ctx *gin.Context) {
@@ -68,7 +68,7 @@ func (c *itemController) FindById(ctx *gin.Context) {
 		return
 	}
 
-	userId := user.(*models.User).ID
+	userId := user.(*ent.User).ID
 
 	// strconv.ParseUint()文字列を整数に変換, 10進数, 64ビット
 	itemId, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
@@ -77,7 +77,7 @@ func (c *itemController) FindById(ctx *gin.Context) {
 		return
 	}
 
-	item, err := c.service.FindById(uint(itemId), userId)
+	item, err := c.service.FindById(int(itemId), int(userId))
 	if err != nil {
 		if err.Error() == "item not found" {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -108,7 +108,7 @@ func (c *itemController) Create(ctx *gin.Context) {
 		return
 	}
 
-	userId := user.(*models.User).ID
+	userId := user.(*ent.User).ID
 
 	var input dto.CreateItemInput
 	if err := ctx.ShouldBindJSON(&input); err != nil {
@@ -116,7 +116,7 @@ func (c *itemController) Create(ctx *gin.Context) {
 		return
 	}
 
-	newItem, err := c.service.Create(input, userId)
+	newItem, err := c.service.Create(input, int(userId))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -147,7 +147,7 @@ func (c *itemController) Update(ctx *gin.Context) {
 		return
 	}
 
-	userId := user.(*models.User).ID
+	userId := user.(*ent.User).ID
 
 	itemId, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
 	if err != nil {
@@ -162,7 +162,7 @@ func (c *itemController) Update(ctx *gin.Context) {
 		return
 	}
 
-	updatedItem, err := c.service.Update(uint(itemId), input, userId)
+	updatedItem, err := c.service.Update(int(itemId), input, int(userId))
 	if err != nil {
 		if err.Error() == "item not found" {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -193,7 +193,7 @@ func (c *itemController) Delete(ctx *gin.Context) {
 		return
 	}
 
-	userId := user.(*models.User).ID
+	userId := user.(*ent.User).ID
 
 	// idを取得
 	itemId, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
@@ -202,7 +202,7 @@ func (c *itemController) Delete(ctx *gin.Context) {
 		return
 	}
 
-	err = c.service.Delete(uint(itemId), userId)
+	err = c.service.Delete(int(itemId), int(userId))
 	if err != nil {
 		if err.Error() == "item not found" {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})

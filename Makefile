@@ -28,8 +28,14 @@ f:
 
 
 # マイグレーション＆シード
+migrate:
+	docker-compose run --rm backend go run cmd/project/main.go -migrate
+
 seed:
-	docker-compose run --rm backend go run database/migrations/migration.go
+	docker-compose run --rm backend go run cmd/project/main.go -seed
+
+# マイグレーションとシードを順次実行
+setup: migrate seed
 
 # swaggoによるAPIドキュメントの生成&整形
 api:
@@ -52,7 +58,7 @@ tidy:
 
 # 型安全なORM用のメソッドの生成
 ent:
-	docker-compose run --rm backend ent generate --target ./internal/ent ./schema
+	docker-compose run --rm backend go generate ./internal/ent
 
 # Atlasのマイグレーションの差分を生成　make atlas_diff xxx
 atlas_diff:

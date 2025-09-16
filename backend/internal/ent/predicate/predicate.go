@@ -9,8 +9,5 @@ import (
 // Item is the predicate function for item builders.
 type Item func(*sql.Selector)
 
-// Movie is the predicate function for movie builders.
-type Movie func(*sql.Selector)
-
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

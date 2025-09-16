@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"project/internal/ent/item"
 	"project/internal/ent/user"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -35,6 +36,21 @@ func (_c *UserCreate) SetLoginID(v string) *UserCreate {
 func (_c *UserCreate) SetPassword(v string) *UserCreate {
 	_c.mutation.SetPassword(v)
 	return _c
+}
+
+// AddItemIDs adds the "items" edge to the Item entity by IDs.
+func (_c *UserCreate) AddItemIDs(ids ...int) *UserCreate {
+	_c.mutation.AddItemIDs(ids...)
+	return _c
+}
+
+// AddItems adds the "items" edges to the Item entity.
+func (_c *UserCreate) AddItems(v ...*Item) *UserCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddItemIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -132,6 +148,22 @@ func (_c *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.Password(); ok {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 		_node.Password = value
+	}
+	if nodes := _c.mutation.ItemsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ItemsTable,
+			Columns: []string{user.ItemsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(item.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

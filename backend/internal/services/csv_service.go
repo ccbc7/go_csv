@@ -5,7 +5,6 @@ import (
 	"os"
 	"sync"
 
-	"project/internal/models"
 	"project/internal/repositories"
 )
 
@@ -28,21 +27,10 @@ func NewCsvService(repository repositories.ICsvRepository, filePath string) ICsv
 // ワーカー関数
 func worker(jobs <-chan []string, results chan<- error, repository repositories.ICsvRepository, wg *sync.WaitGroup) {
 	defer wg.Done()
-	for record := range jobs {
-		// CSVデータを構造体に変換
-		csvData := models.Csv{
-			FirstName:   record[1],
-			LastName:    record[2],
-			Email:       record[3],
-			PhoneNumber: record[4],
-			Address:     record[5],
-			City:        record[6],
-			State:       record[7],
-			ZipCode:     record[8],
-			Country:     record[9],
-		}
-		// リポジトリ層のCreateCsvメソッドを呼び出し,以降の処理はリポジトリ層に委ねる
-		_, err := repository.CreateCsv(csvData)
+	for range jobs {
+		// CSVデータの処理（現在は空の実装）
+		// リポジトリ層のProcessCsvDataメソッドを呼び出し,以降の処理はリポジトリ層に委ねる
+		err := repository.ProcessCsvData()
 		results <- err
 	}
 }
