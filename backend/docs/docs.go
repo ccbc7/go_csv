@@ -185,7 +185,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Item"
+                            "$ref": "#/definitions/ent.Item"
                         }
                     },
                     "500": {
@@ -220,7 +220,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/models.Item"
+                            "$ref": "#/definitions/ent.Item"
                         }
                     },
                     "400": {
@@ -362,10 +362,14 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "email",
+                "name",
                 "password"
             ],
             "properties": {
                 "email": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 },
                 "password": {
@@ -394,35 +398,90 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Item": {
+        "ent.Item": {
             "type": "object",
             "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "deleted_at": {
-                    "type": "string"
-                },
                 "description": {
+                    "description": "Description holds the value of the \"description\" field.",
                     "type": "string"
+                },
+                "edges": {
+                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the ItemQuery when eager-loading is set.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.ItemEdges"
+                        }
+                    ]
                 },
                 "id": {
+                    "description": "ID of the ent.",
                     "type": "integer"
                 },
                 "name": {
+                    "description": "Name holds the value of the \"name\" field.",
                     "type": "string"
                 },
                 "price": {
+                    "description": "Price holds the value of the \"price\" field.",
                     "type": "integer"
                 },
                 "sold_out": {
+                    "description": "SoldOut holds the value of the \"sold_out\" field.",
                     "type": "boolean"
                 },
-                "updated_at": {
+                "user_id": {
+                    "description": "UserID holds the value of the \"user_id\" field.",
+                    "type": "integer"
+                }
+            }
+        },
+        "ent.ItemEdges": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "description": "User holds the value of the user edge.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.User"
+                        }
+                    ]
+                }
+            }
+        },
+        "ent.User": {
+            "type": "object",
+            "properties": {
+                "edges": {
+                    "description": "Edges holds the relations/edges for other nodes in the graph.\nThe values are being populated by the UserQuery when eager-loading is set.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/ent.UserEdges"
+                        }
+                    ]
+                },
+                "id": {
+                    "description": "ID of the ent.",
+                    "type": "integer"
+                },
+                "login_id": {
+                    "description": "LoginID holds the value of the \"login_id\" field.",
                     "type": "string"
                 },
-                "user_id": {
-                    "type": "integer"
+                "name": {
+                    "description": "Name holds the value of the \"name\" field.",
+                    "type": "string"
+                }
+            }
+        },
+        "ent.UserEdges": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "description": "Items holds the value of the items edge.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ent.Item"
+                    }
                 }
             }
         }

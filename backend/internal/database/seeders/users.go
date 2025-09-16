@@ -4,6 +4,8 @@ import (
 	"context"
 
 	"project/internal/ent"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 func SeedUsers(client *ent.Client) error {
@@ -17,10 +19,16 @@ func SeedUsers(client *ent.Client) error {
 	}
 
 	for _, user := range users {
-		_, err := client.User.Create().
+		// パスワードをハッシュ化
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+		if err != nil {
+			return err
+		}
+
+		_, err = client.User.Create().
 			SetName(user.Name).
 			SetLoginID(user.LoginID).
-			SetPassword(user.Password).
+			SetPassword(string(hashedPassword)).
 			Save(context.Background())
 		if err != nil {
 			return err

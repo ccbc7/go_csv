@@ -21,6 +21,7 @@ import (
 func main() {
 	seed := flag.Bool("seed", false, "Run the database seeders")
 	migrate := flag.Bool("migrate", false, "Run ent schema migration and exit")
+	reset := flag.Bool("reset", false, "Reset database (drop and recreate all tables)")
 	flag.Parse()
 
 	// 初期化(環境変数の読み込み)
@@ -40,6 +41,24 @@ func main() {
 		log.Fatalf("failed opening connection to postgres: %v", err)
 	}
 	defer client.Close()
+
+	if *reset {
+		// データベースを完全リセット (テーブルを削除してから再作成)
+		_, err := client.Item.Delete().Exec(context.Background())
+		if err != nil {
+			log.Printf("warning: failed to delete items: %v", err)
+		}
+		_, err = client.User.Delete().Exec(context.Background())
+		if err != nil {
+			log.Printf("warning: failed to delete users: %v", err)
+		}
+
+		fmt.Println("Data cleared successfully")
+		fmt.Println("Note: Run 'make reset_sequences' to reset all ID sequences to 1")
+
+		fmt.Println("Database reset completed")
+		return
+	}
 
 	if *migrate {
 		// Entのマイグレーションのみ実行して終了

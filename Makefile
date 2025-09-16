@@ -37,6 +37,20 @@ seed:
 # マイグレーションとシードを順次実行
 setup: migrate seed
 
+# データベースを完全リセット
+reset:
+	docker-compose run --rm backend go run cmd/project/main.go -reset
+
+# シーケンスをリセット（IDを1から開始）- 全テーブルのシーケンスを自動検出
+reset_sequences:
+	docker-compose exec db psql -U ginuser -d gin -c "SELECT setval(sequence_name::text, 1, false) FROM information_schema.sequences WHERE sequence_schema = 'public' AND sequence_name LIKE '%_id_seq';"
+
+# データベースを完全リセットしてシーケンスもリセット、シードも実行
+reset_setup: 
+	$(MAKE) reset
+	$(MAKE) reset_sequences  
+	$(MAKE) seed
+
 # swaggoによるAPIドキュメントの生成&整形
 api:
 	docker-compose run --rm backend swag init -g cmd/project/main.go && docker-compose run --rm backend swag fmt

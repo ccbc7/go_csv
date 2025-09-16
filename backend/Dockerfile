@@ -20,7 +20,8 @@ RUN chmod 777 /app
 # 開発ツールのインストール
 RUN go install github.com/air-verse/air@latest \
     && go install github.com/go-delve/delve/cmd/dlv@latest \
-    && go install entgo.io/ent/cmd/ent@latest
+    && go install entgo.io/ent/cmd/ent@latest \
+    && go install github.com/swaggo/swag/cmd/swag@latest
 
 # Atlas CLI をインストール（プリビルトバイナリ）
 RUN curl -sSf https://atlasgo.sh | sh -s -- -b /usr/local/bin

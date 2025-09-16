@@ -84,6 +84,7 @@ func (c *itemController) FindById(ctx *gin.Context) {
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Unexpected error"})
+		return
 	}
 	ctx.JSON(http.StatusOK, gin.H{"data": item})
 }
@@ -96,7 +97,7 @@ func (c *itemController) FindById(ctx *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			item	body		dto.CreateItemInput	true	"Item information"	example({"name": "item1", "price": 100, "description": "This is item1"})
-//	@Success		201		{object}	models.Item
+//	@Success		201		{object}	ent.Item
 //	@Failure		400
 //	@Failure		500
 //	@Router			/items [post]
@@ -169,6 +170,7 @@ func (c *itemController) Update(ctx *gin.Context) {
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Unexpected error"})
+		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"data": updatedItem})
@@ -209,6 +211,7 @@ func (c *itemController) Delete(ctx *gin.Context) {
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Unexpected error"})
+		return
 	}
 
 	ctx.JSON(http.StatusNoContent, nil)
