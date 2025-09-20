@@ -59,12 +59,23 @@ api:
 fmt:
 	docker-compose run --rm backend go fmt ./...
 
-# 静的解析（標準のgo vetを使用）
+# フォーマット（詳細出力）
+fmt_verbose:
+	docker-compose run --rm backend go fmt -x ./...
+
+# 静的解析（詳細出力）コードの潜在的なバグや問題を検出する
 vet:
 	docker-compose run --rm backend go vet ./...
 
+# 静的解析（詳細出力）
+vet_verbose:
+	docker-compose run --rm backend go vet -v ./...
+
 # フォーマットと静的解析を実行
 fix: fmt vet
+
+# フォーマットと静的解析を実行（詳細出力）
+fix_verbose: fmt_verbose vet_verbose
 
 # 依存関係の解決
 tidy:
