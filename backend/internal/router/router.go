@@ -2,7 +2,7 @@ package router
 
 import (
 	"project/internal/ent"
-	controllers "project/internal/handlers"
+	"project/internal/handlers"
 	"project/internal/middlewares"
 	"project/internal/repositories"
 	"project/internal/services"
@@ -18,16 +18,16 @@ import (
 func SetupRouter(client *ent.Client) *gin.Engine {
 	itemRepository := repositories.NewItemRepository(client)
 	itemService := services.NewItemService(itemRepository)
-	itemController := controllers.NewItemController(itemService)
+	itemController := handlers.NewItemController(itemService)
 
 	authRepository := repositories.NewAuthRepository(client)
 	authService := services.NewAuthService(authRepository)
-	authController := controllers.NewAuthController(authService)
+	authController := handlers.NewAuthController(authService)
 
 	csvRepository := repositories.NewCsvRepository(client)
 	filepath := "./data/sample_data_100000.csv"
 	csvService := services.NewCsvService(csvRepository, filepath)
-	csvController := controllers.NewCsvController(csvService)
+	csvController := handlers.NewCsvController(csvService)
 
 	// ルーターの作成
 	r := gin.Default()
@@ -40,7 +40,7 @@ func SetupRouter(client *ent.Client) *gin.Engine {
 	{
 		eg := v1.Group("/")
 		{
-			eg.GET("/hello", controllers.HelloWorld)
+			eg.GET("/hello", handlers.HelloWorld)
 		}
 
 		// ルーティンググループの作成
@@ -65,7 +65,7 @@ func SetupRouter(client *ent.Client) *gin.Engine {
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
-	r.GET("/", controllers.HelloWorld)
+	r.GET("/", handlers.HelloWorld)
 
 	return r
 }
