@@ -13,3 +13,5 @@ backend/.env.test
 backend/data/
 .env
 
+# IDE設定ファイル
+.idea/
