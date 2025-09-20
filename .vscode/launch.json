@@ -17,17 +17,24 @@
 {
   "version": "0.2.0",
   "configurations": [
-    {
-      "name": "delv",
-      "type": "go",
-      "request": "attach", // attachは既存のプロセスに接続する
-      "mode": "remote", //デバッグのモードを指定する remoteはリモートデバッグを行う
-      "remotePath": "/app", // コンテナ内の作業ディレクトリ
-      "port": 2345,
-      "host": "localhost",
-      "cwd": "${workspaceFolder}/backend", // ローカルの作業ディレクトリ
-      "showLog": true, //デバッグログを表示するかどうかを指定する
-      "trace": "verbose", // デバッグログの詳細度を指定する
-    }
+      {
+        "name": "delv",
+        "type": "go",
+        "request": "attach",
+        "mode": "remote",
+        "remotePath": "/app",
+        "substitutePath": [
+          {
+            "from": "${workspaceFolder}/backend",
+            "to": "/app"
+          }
+        ],
+        "port": 2345,
+        "host": "localhost",
+        "cwd": "${workspaceFolder}/backend",
+        "showLog": true,
+        "trace": "verbose",
+        "apiVersion": 2
+      }
   ]
 }
