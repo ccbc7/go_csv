@@ -9,11 +9,7 @@ import (
 )
 
 func SeedUsers(client *ent.Client) error {
-	users := []struct {
-		Name     string
-		LoginID  string
-		Password string
-	}{
+	users := []ent.User{
 		{Name: "テストユーザー1", LoginID: "test1@example.com", Password: "password123"},
 		{Name: "テストユーザー2", LoginID: "test2@example.com", Password: "password123"},
 	}

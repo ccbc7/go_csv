@@ -17,12 +17,7 @@ func SeedItems(client *ent.Client) error {
 		return nil // ユーザーがいない場合は何もしない
 	}
 
-	items := []struct {
-		Name        string
-		Price       int
-		Description string
-		SoldOut     bool
-	}{
+	items := []ent.Item{
 		{Name: "Item1", Price: 100, Description: "Description1", SoldOut: false},
 		{Name: "Item2", Price: 200, Description: "Description2", SoldOut: false},
 		{Name: "Item3", Price: 300, Description: "Description3", SoldOut: false},
