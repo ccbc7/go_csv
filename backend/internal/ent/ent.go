@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"project/internal/ent/item"
+	"project/internal/ent/movie"
 	"project/internal/ent/user"
 	"reflect"
 	"sync"
@@ -74,8 +75,9 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			item.Table: item.ValidColumn,
-			user.Table: user.ValidColumn,
+			item.Table:  item.ValidColumn,
+			movie.Table: movie.ValidColumn,
+			user.Table:  user.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

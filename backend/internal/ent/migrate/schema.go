@@ -31,6 +31,23 @@ var (
 			},
 		},
 	}
+	// MoviesColumns holds the columns for the "movies" table.
+	MoviesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "title", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "duration", Type: field.TypeInt},
+		{Name: "genre", Type: field.TypeString, Nullable: true},
+		{Name: "director", Type: field.TypeString, Nullable: true},
+		{Name: "cast", Type: field.TypeString, Nullable: true},
+		{Name: "release_date", Type: field.TypeTime, Nullable: true},
+	}
+	// MoviesTable holds the schema information for the "movies" table.
+	MoviesTable = &schema.Table{
+		Name:       "movies",
+		Columns:    MoviesColumns,
+		PrimaryKey: []*schema.Column{MoviesColumns[0]},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -47,6 +64,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		ItemsTable,
+		MoviesTable,
 		UsersTable,
 	}
 )

@@ -12,6 +12,12 @@ up:
 upd:
 	docker compose up -d
 
+# デバッグモードで起動
+debug:
+	docker compose up -d db
+	docker compose run --rm -p 8080:8080 -p 2345:2345 backend dlv debug --headless --listen=:2345 --api-version=2 --accept-multiclient cmd/project/main.go
+
+
 # 再起動
 re:
 	docker compose restart
@@ -41,16 +47,6 @@ setup: migrate seed
 reset:
 	docker-compose run --rm backend go run cmd/project/main.go -reset
 
-# シーケンスをリセット（IDを1から開始）- 全テーブルのシーケンスを自動検出
-reset_sequences:
-	docker-compose exec db psql -U ginuser -d gin -c "SELECT setval(sequence_name::text, 1, false) FROM information_schema.sequences WHERE sequence_schema = 'public' AND sequence_name LIKE '%_id_seq';"
-
-# データベースを完全リセットしてシーケンスもリセット、シードも実行
-reset_setup: 
-	$(MAKE) reset
-	$(MAKE) reset_sequences  
-	$(MAKE) seed
-
 # swaggoによるAPIドキュメントの生成&整形
 api:
 	docker-compose run --rm backend swag init -g cmd/project/main.go && docker-compose run --rm backend swag fmt
@@ -59,23 +55,12 @@ api:
 fmt:
 	docker-compose run --rm backend go fmt ./...
 
-# フォーマット（詳細出力）
-fmt_verbose:
-	docker-compose run --rm backend go fmt -x ./...
-
-# 静的解析（詳細出力）コードの潜在的なバグや問題を検出する
+# 静的解析（標準のgo vetを使用）
 vet:
 	docker-compose run --rm backend go vet ./...
 
-# 静的解析（詳細出力）
-vet_verbose:
-	docker-compose run --rm backend go vet -v ./...
-
 # フォーマットと静的解析を実行
 fix: fmt vet
-
-# フォーマットと静的解析を実行（詳細出力）
-fix_verbose: fmt_verbose vet_verbose
 
 # 依存関係の解決
 tidy:
@@ -83,7 +68,7 @@ tidy:
 
 # 型安全なORM用のメソッドの生成
 ent:
-	docker-compose run --rm backend go generate ./internal/ent
+	docker-compose run --rm backend ent generate --target ./internal/ent ./internal/models
 
 # Atlasのマイグレーションの差分を生成　make atlas_diff xxx
 atlas_diff:

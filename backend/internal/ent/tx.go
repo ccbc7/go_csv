@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// Item is the client for interacting with the Item builders.
 	Item *ItemClient
+	// Movie is the client for interacting with the Movie builders.
+	Movie *MovieClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 
@@ -148,6 +150,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Item = NewItemClient(tx.config)
+	tx.Movie = NewMovieClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
 

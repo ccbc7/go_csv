@@ -4,15 +4,16 @@ package ent
 
 import (
 	"project/internal/ent/item"
-	"project/internal/ent/schema"
+	"project/internal/ent/movie"
 	"project/internal/ent/user"
+	"project/internal/models"
 )
 
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
-	itemFields := schema.Item{}.Fields()
+	itemFields := models.Item{}.Fields()
 	_ = itemFields
 	// itemDescName is the schema descriptor for name field.
 	itemDescName := itemFields[0].Descriptor()
@@ -30,7 +31,17 @@ func init() {
 	itemDescUserID := itemFields[4].Descriptor()
 	// item.UserIDValidator is a validator for the "user_id" field. It is called by the builders before save.
 	item.UserIDValidator = itemDescUserID.Validators[0].(func(int) error)
-	userFields := schema.User{}.Fields()
+	movieFields := models.Movie{}.Fields()
+	_ = movieFields
+	// movieDescTitle is the schema descriptor for title field.
+	movieDescTitle := movieFields[0].Descriptor()
+	// movie.TitleValidator is a validator for the "title" field. It is called by the builders before save.
+	movie.TitleValidator = movieDescTitle.Validators[0].(func(string) error)
+	// movieDescDuration is the schema descriptor for duration field.
+	movieDescDuration := movieFields[2].Descriptor()
+	// movie.DurationValidator is a validator for the "duration" field. It is called by the builders before save.
+	movie.DurationValidator = movieDescDuration.Validators[0].(func(int) error)
+	userFields := models.User{}.Fields()
 	_ = userFields
 	// userDescName is the schema descriptor for name field.
 	userDescName := userFields[0].Descriptor()

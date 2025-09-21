@@ -12,6 +12,7 @@ import (
 	"project/internal/ent/migrate"
 
 	"project/internal/ent/item"
+	"project/internal/ent/movie"
 	"project/internal/ent/user"
 
 	"entgo.io/ent"
@@ -27,6 +28,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// Item is the client for interacting with the Item builders.
 	Item *ItemClient
+	// Movie is the client for interacting with the Movie builders.
+	Movie *MovieClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 }
@@ -41,6 +44,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Item = NewItemClient(c.config)
+	c.Movie = NewMovieClient(c.config)
 	c.User = NewUserClient(c.config)
 }
 
@@ -135,6 +139,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:    ctx,
 		config: cfg,
 		Item:   NewItemClient(cfg),
+		Movie:  NewMovieClient(cfg),
 		User:   NewUserClient(cfg),
 	}, nil
 }
@@ -156,6 +161,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:    ctx,
 		config: cfg,
 		Item:   NewItemClient(cfg),
+		Movie:  NewMovieClient(cfg),
 		User:   NewUserClient(cfg),
 	}, nil
 }
@@ -186,6 +192,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Item.Use(hooks...)
+	c.Movie.Use(hooks...)
 	c.User.Use(hooks...)
 }
 
@@ -193,6 +200,7 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Item.Intercept(interceptors...)
+	c.Movie.Intercept(interceptors...)
 	c.User.Intercept(interceptors...)
 }
 
@@ -201,6 +209,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *ItemMutation:
 		return c.Item.mutate(ctx, m)
+	case *MovieMutation:
+		return c.Movie.mutate(ctx, m)
 	case *UserMutation:
 		return c.User.mutate(ctx, m)
 	default:
@@ -357,6 +367,139 @@ func (c *ItemClient) mutate(ctx context.Context, m *ItemMutation) (Value, error)
 	}
 }
 
+// MovieClient is a client for the Movie schema.
+type MovieClient struct {
+	config
+}
+
+// NewMovieClient returns a client for the Movie from the given config.
+func NewMovieClient(c config) *MovieClient {
+	return &MovieClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `movie.Hooks(f(g(h())))`.
+func (c *MovieClient) Use(hooks ...Hook) {
+	c.hooks.Movie = append(c.hooks.Movie, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `movie.Intercept(f(g(h())))`.
+func (c *MovieClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Movie = append(c.inters.Movie, interceptors...)
+}
+
+// Create returns a builder for creating a Movie entity.
+func (c *MovieClient) Create() *MovieCreate {
+	mutation := newMovieMutation(c.config, OpCreate)
+	return &MovieCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Movie entities.
+func (c *MovieClient) CreateBulk(builders ...*MovieCreate) *MovieCreateBulk {
+	return &MovieCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *MovieClient) MapCreateBulk(slice any, setFunc func(*MovieCreate, int)) *MovieCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &MovieCreateBulk{err: fmt.Errorf("calling to MovieClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*MovieCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &MovieCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Movie.
+func (c *MovieClient) Update() *MovieUpdate {
+	mutation := newMovieMutation(c.config, OpUpdate)
+	return &MovieUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *MovieClient) UpdateOne(_m *Movie) *MovieUpdateOne {
+	mutation := newMovieMutation(c.config, OpUpdateOne, withMovie(_m))
+	return &MovieUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *MovieClient) UpdateOneID(id int) *MovieUpdateOne {
+	mutation := newMovieMutation(c.config, OpUpdateOne, withMovieID(id))
+	return &MovieUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Movie.
+func (c *MovieClient) Delete() *MovieDelete {
+	mutation := newMovieMutation(c.config, OpDelete)
+	return &MovieDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *MovieClient) DeleteOne(_m *Movie) *MovieDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *MovieClient) DeleteOneID(id int) *MovieDeleteOne {
+	builder := c.Delete().Where(movie.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &MovieDeleteOne{builder}
+}
+
+// Query returns a query builder for Movie.
+func (c *MovieClient) Query() *MovieQuery {
+	return &MovieQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeMovie},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Movie entity by its id.
+func (c *MovieClient) Get(ctx context.Context, id int) (*Movie, error) {
+	return c.Query().Where(movie.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *MovieClient) GetX(ctx context.Context, id int) *Movie {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *MovieClient) Hooks() []Hook {
+	return c.hooks.Movie
+}
+
+// Interceptors returns the client interceptors.
+func (c *MovieClient) Interceptors() []Interceptor {
+	return c.inters.Movie
+}
+
+func (c *MovieClient) mutate(ctx context.Context, m *MovieMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&MovieCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&MovieUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&MovieUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&MovieDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Movie mutation op: %q", m.Op())
+	}
+}
+
 // UserClient is a client for the User schema.
 type UserClient struct {
 	config
@@ -509,9 +652,9 @@ func (c *UserClient) mutate(ctx context.Context, m *UserMutation) (Value, error)
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Item, User []ent.Hook
+		Item, Movie, User []ent.Hook
 	}
 	inters struct {
-		Item, User []ent.Interceptor
+		Item, Movie, User []ent.Interceptor
 	}
 )
