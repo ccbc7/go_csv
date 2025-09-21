@@ -48,7 +48,7 @@ reset:
 	docker-compose run --rm backend go run cmd/project/main.go -reset
 
 # swaggoによるAPIドキュメントの生成&整形
-api:
+swagger:
 	docker-compose run --rm backend swag init -g cmd/project/main.go && docker-compose run --rm backend swag fmt
 
 # フォーマット（標準のgo fmtを使用）

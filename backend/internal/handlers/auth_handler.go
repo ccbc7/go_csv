@@ -31,11 +31,11 @@ func NewAuthHandler(service services.IAuthService) IAuthHandler {
 //	@Tags			auth
 //	@Accept			json
 //	@Produce		json
-//	@Param			input	body		dto.SignupInput	true	"User info"	example({"name": "John Doe", "email": "john@example.com", "password": "password123"})
+//	@Param			input	body		dto.SignupInput	true	"Signup info"
 //	@Success		201		{string}	string			"created"
 //	@Failure		400		{string}	string			"bad request"
 //	@Failure		500		{string}	string			"internal server error"
-//	@Router			/auth/signup [post]
+//	@Router			/api/v1/auth/signup [post]
 func (h *AuthHandler) SignUp(ctx *gin.Context) {
 	var input dto.SignupInput
 	if err := ctx.ShouldBindJSON(&input); err != nil {
@@ -53,6 +53,17 @@ func (h *AuthHandler) SignUp(ctx *gin.Context) {
 }
 
 // Login godoc
+//
+//	@Summary		Login a user
+//	@Description	Login a user with the input payload
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			input	body		dto.LoginInput	true	"Login info"
+//	@Success		200		{string}	string			"ok"
+//	@Failure		400		{string}	string			"bad request"
+//	@Failure		500		{string}	string			"internal server error"
+//	@Router			/api/v1/auth/login [post]
 func (h *AuthHandler) Login(ctx *gin.Context) {
 	var input dto.LoginInput
 	if err := ctx.ShouldBindJSON(&input); err != nil {

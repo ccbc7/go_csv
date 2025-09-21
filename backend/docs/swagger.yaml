@@ -18,6 +18,19 @@ definitions:
     - name
     - price
     type: object
+  dto.LoginInput:
+    properties:
+      email:
+        example: john@example.com
+        type: string
+      password:
+        example: password123
+        minLength: 8
+        type: string
+    required:
+    - email
+    - password
+    type: object
   dto.SignupInput:
     properties:
       email:
@@ -115,36 +128,43 @@ info:
   title: Swagger Example API
   version: "1.0"
 paths:
-  /api/v1/items/{id}:
-    get:
-      description: Get item from the database by ID
+  /api/v1/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login a user with the input payload
       parameters:
-      - description: Item ID
-        in: path
-        name: id
+      - description: Login info
+        in: body
+        name: input
         required: true
-        type: integer
+        schema:
+          $ref: '#/definitions/dto.LoginInput'
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: ok
+          schema:
+            type: string
         "400":
-          description: Bad Request
-        "404":
-          description: Not Found
+          description: bad request
+          schema:
+            type: string
         "500":
-          description: Internal Server Error
-      summary: Get item by ID
+          description: internal server error
+          schema:
+            type: string
+      summary: Login a user
       tags:
-      - items
-  /auth/signup:
+      - auth
+  /api/v1/auth/signup:
     post:
       consumes:
       - application/json
       description: Create a new user with the input payload
       parameters:
-      - description: User info
+      - description: Signup info
         in: body
         name: input
         required: true
@@ -168,6 +188,29 @@ paths:
       summary: Create a new user
       tags:
       - auth
+  /api/v1/items/{id}:
+    get:
+      description: Get item from the database by ID
+      parameters:
+      - description: Item ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+      summary: Get item by ID
+      tags:
+      - items
   /hello:
     get:
       consumes:
