@@ -7,16 +7,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type CsvController struct {
+type CsvHandler struct {
 	services services.ICsvService
 }
 
-func NewCsvController(services services.ICsvService) *CsvController {
-	return &CsvController{services: services}
+func NewCsvHandler(services services.ICsvService) *CsvHandler {
+	return &CsvHandler{services: services}
 }
 
-func (c *CsvController) ProcessCsv(ctx *gin.Context) {
-	err := c.services.ProcessCsv()
+func (h *CsvHandler) ProcessCsv(ctx *gin.Context) {
+	err := h.services.ProcessCsv()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

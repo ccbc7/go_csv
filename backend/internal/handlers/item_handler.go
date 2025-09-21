@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type ItemController interface {
+type ItemHandler interface {
 	FindAll(ctx *gin.Context)
 	FindById(ctx *gin.Context)
 	Create(ctx *gin.Context)
@@ -20,12 +20,12 @@ type ItemController interface {
 	Delete(ctx *gin.Context)
 }
 
-type itemController struct {
+type itemHandler struct {
 	service services.IItemService
 }
 
-func NewItemController(service services.IItemService) ItemController {
-	return &itemController{service: service}
+func NewItemHandler(service services.IItemService) ItemHandler {
+	return &itemHandler{service: service}
 }
 
 // FindAll godoc
@@ -37,9 +37,9 @@ func NewItemController(service services.IItemService) ItemController {
 //	@Success		200	{object}	ent.Item
 //	@Failure		500
 //	@Router			/items [get]
-func (c *itemController) FindAll(ctx *gin.Context) {
+func (h *itemHandler) FindAll(ctx *gin.Context) {
 	// サービスのFindAll()メソッドを呼び出し、結果をJSON形式で返す
-	items, err := c.service.FindAll()
+	items, err := h.service.FindAll()
 	if err != nil {
 		ctx.JSON(
 			http.StatusInternalServerError, gin.H{"error": "Unexpected error"})
@@ -60,7 +60,7 @@ func (c *itemController) FindAll(ctx *gin.Context) {
 //	@Failure		404
 //	@Failure		500
 //	@Router			/api/v1/items/{id} [get]\
-func (c *itemController) FindById(ctx *gin.Context) {
+func (h *itemHandler) FindById(ctx *gin.Context) {
 	// IDで商品を取得
 	user, exists := ctx.Get("user")
 	if !exists {
@@ -77,7 +77,7 @@ func (c *itemController) FindById(ctx *gin.Context) {
 		return
 	}
 
-	item, err := c.service.FindById(int(itemId), int(userId))
+	item, err := h.service.FindById(int(itemId), int(userId))
 	if err != nil {
 		if err.Error() == "item not found" {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -101,7 +101,7 @@ func (c *itemController) FindById(ctx *gin.Context) {
 //	@Failure		400
 //	@Failure		500
 //	@Router			/items [post]
-func (c *itemController) Create(ctx *gin.Context) {
+func (h *itemHandler) Create(ctx *gin.Context) {
 	// ユーザー情報を取得
 	user, exists := ctx.Get("user")
 	if !exists {
@@ -117,7 +117,7 @@ func (c *itemController) Create(ctx *gin.Context) {
 		return
 	}
 
-	newItem, err := c.service.Create(input, int(userId))
+	newItem, err := h.service.Create(input, int(userId))
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -140,7 +140,7 @@ func (c *itemController) Create(ctx *gin.Context) {
 //	@Failure		404
 //	@Failure		500
 //	@Router			/items/{id} [put]
-func (c *itemController) Update(ctx *gin.Context) {
+func (h *itemHandler) Update(ctx *gin.Context) {
 	//ユーザーを取得
 	user, exists := ctx.Get("user")
 	if !exists {
@@ -163,7 +163,7 @@ func (c *itemController) Update(ctx *gin.Context) {
 		return
 	}
 
-	updatedItem, err := c.service.Update(int(itemId), input, int(userId))
+	updatedItem, err := h.service.Update(int(itemId), input, int(userId))
 	if err != nil {
 		if err.Error() == "item not found" {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -188,7 +188,7 @@ func (c *itemController) Update(ctx *gin.Context) {
 //	@Failure		404
 //	@Failure		500
 //	@Router			/items/{id} [delete]
-func (c *itemController) Delete(ctx *gin.Context) {
+func (h *itemHandler) Delete(ctx *gin.Context) {
 	user, exists := ctx.Get("user")
 	if !exists {
 		ctx.AbortWithStatus(http.StatusUnauthorized)
@@ -204,7 +204,7 @@ func (c *itemController) Delete(ctx *gin.Context) {
 		return
 	}
 
-	err = c.service.Delete(int(itemId), int(userId))
+	err = h.service.Delete(int(itemId), int(userId))
 	if err != nil {
 		if err.Error() == "item not found" {
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})

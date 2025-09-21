@@ -18,24 +18,16 @@ definitions:
     - name
     - price
     type: object
-  dto.LoginInput:
-    properties:
-      email:
-        type: string
-      password:
-        minLength: 8
-        type: string
-    required:
-    - email
-    - password
-    type: object
   dto.SignupInput:
     properties:
       email:
+        example: john@example.com
         type: string
       name:
+        example: John Doe
         type: string
       password:
+        example: password123
         minLength: 8
         type: string
     required:
@@ -146,40 +138,6 @@ paths:
       summary: Get item by ID
       tags:
       - items
-  /auth/login:
-    post:
-      consumes:
-      - application/json
-      description: Login with the input payload
-      parameters:
-      - description: User info
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/dto.LoginInput'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: token
-          schema:
-            type: string
-        "400":
-          description: bad request
-          schema:
-            type: string
-        "404":
-          description: user not found
-          schema:
-            type: string
-        "500":
-          description: internal server error
-          schema:
-            type: string
-      summary: Login
-      tags:
-      - auth
   /auth/signup:
     post:
       consumes:

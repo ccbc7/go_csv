@@ -50,58 +50,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/login": {
-            "post": {
-                "description": "Login with the input payload",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Login",
-                "parameters": [
-                    {
-                        "description": "User info",
-                        "name": "input",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.LoginInput"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "token",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "bad request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "user not found",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "internal server error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/auth/signup": {
             "post": {
                 "description": "Create a new user with the input payload",
@@ -342,22 +290,6 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.LoginInput": {
-            "type": "object",
-            "required": [
-                "email",
-                "password"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string",
-                    "minLength": 8
-                }
-            }
-        },
         "dto.SignupInput": {
             "type": "object",
             "required": [
@@ -367,14 +299,17 @@ const docTemplate = `{
             ],
             "properties": {
                 "email": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "john@example.com"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "John Doe"
                 },
                 "password": {
                     "type": "string",
-                    "minLength": 8
+                    "minLength": 8,
+                    "example": "password123"
                 }
             }
         },
