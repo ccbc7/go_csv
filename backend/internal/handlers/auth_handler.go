@@ -35,7 +35,7 @@ func NewAuthHandler(service services.IAuthService) IAuthHandler {
 //	@Success		201		{string}	string			"created"
 //	@Failure		400		{string}	string			"bad request"
 //	@Failure		500		{string}	string			"internal server error"
-//	@Router			/api/v1/auth/signup [post]
+//	@Router			/auth/signup [post]
 func (h *AuthHandler) SignUp(ctx *gin.Context) {
 	var input dto.SignupInput
 	if err := ctx.ShouldBindJSON(&input); err != nil {
@@ -63,7 +63,7 @@ func (h *AuthHandler) SignUp(ctx *gin.Context) {
 //	@Success		200		{string}	string			"ok"
 //	@Failure		400		{string}	string			"bad request"
 //	@Failure		500		{string}	string			"internal server error"
-//	@Router			/api/v1/auth/login [post]
+//	@Router			/auth/login [post]
 func (h *AuthHandler) Login(ctx *gin.Context) {
 	var input dto.LoginInput
 	if err := ctx.ShouldBindJSON(&input); err != nil {
