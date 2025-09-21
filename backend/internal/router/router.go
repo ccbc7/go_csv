@@ -18,16 +18,16 @@ import (
 func SetupRouter(client *ent.Client) *gin.Engine {
 	itemRepository := repositories.NewItemRepository(client)
 	itemService := services.NewItemService(itemRepository)
-	itemController := handlers.NewItemController(itemService)
+	itemHandler := handlers.NewItemHandler(itemService)
 
 	authRepository := repositories.NewAuthRepository(client)
 	authService := services.NewAuthService(authRepository)
-	authController := handlers.NewAuthController(authService)
+	authHandler := handlers.NewAuthHandler(authService)
 
 	csvRepository := repositories.NewCsvRepository(client)
 	filepath := "./data/sample_data_100000.csv"
 	csvService := services.NewCsvService(csvRepository, filepath)
-	csvController := handlers.NewCsvController(csvService)
+	csvHandler := handlers.NewCsvHandler(csvService)
 
 	// ルーターの作成
 	r := gin.Default()
@@ -50,17 +50,17 @@ func SetupRouter(client *ent.Client) *gin.Engine {
 		csvRouter := v1.Group("/csv")
 
 		// ルーティングの設定
-		itemRouter.GET("", itemController.FindAll)
+		itemRouter.GET("", itemHandler.FindAll)
 
-		itemRouterWithAuth.GET("/:id", itemController.FindById)
-		itemRouterWithAuth.POST("", itemController.Create)
-		itemRouterWithAuth.PUT("/:id", itemController.Update)
-		itemRouterWithAuth.DELETE("/:id", itemController.Delete)
+		itemRouterWithAuth.GET("/:id", itemHandler.FindById)
+		itemRouterWithAuth.POST("", itemHandler.Create)
+		itemRouterWithAuth.PUT("/:id", itemHandler.Update)
+		itemRouterWithAuth.DELETE("/:id", itemHandler.Delete)
 
-		authRouter.POST("/signup", authController.SignUp)
-		authRouter.POST("/login", authController.Login)
+		authRouter.POST("/signup", authHandler.SignUp)
+		authRouter.POST("/login", authHandler.Login)
 
-		csvRouter.POST("/process", csvController.ProcessCsv)
+		csvRouter.POST("/process", csvHandler.ProcessCsv)
 	}
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))

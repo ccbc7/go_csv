@@ -74,7 +74,7 @@ ent:
 atlas_diff:
 	docker-compose run --rm backend atlas migrate diff $(filter-out $@,$(MAKECMDGOALS)) \
 --dir "file:///./internal/database/migrations" \
---to "ent://schema" \
+	--to "ent://./internal/models" \
 --dev-url "postgres://ginuser:ginpassword@postgres:5432/gin?sslmode=disable"
 
 # Atlasマイグレーション削除(※手動で削除してもvolumeを消さないとAtlasは気づかないよ)
@@ -82,17 +82,17 @@ atlas_rm:
 	docker-compose run --rm backend atlas migrate rm \
 --dir "file://internal/database/migrations"
 
-# # Atlasマイグレーション適用
-# atlas_apply:
-# 	docker-compose run --rm backend atlas migrate apply \
-# --dir "file://internal/database/migrations" \
-# --url "postgres://ginuser:ginpassword@postgres:5432/gin?sslmode=disable"
+# Atlasマイグレーション適用
+atlas_apply:
+	docker-compose run --rm backend atlas migrate apply \
+--dir "file://internal/database/migrations" \
+--url "postgres://ginuser:ginpassword@postgres:5432/gin?sslmode=disable"
 
-# # Atlasマイグレーション状態確認
-# atlas_status:
-# 	docker-compose run --rm backend atlas migrate status \
-# --dir "file://internal/database/migrations" \
-# --url "postgres://ginuser:ginpassword@postgres:5432/gin?sslmode=disable"
+# Atlasマイグレーション状態確認
+atlas_status:
+	docker-compose run --rm backend atlas migrate status \
+--dir "file://internal/database/migrations" \
+--url "postgres://ginuser:ginpassword@postgres:5432/gin?sslmode=disable"
 
 # 位置引数を無視するためのダミーターゲット
 %:
