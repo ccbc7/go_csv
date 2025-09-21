@@ -163,6 +163,53 @@ func (_u *MovieUpdate) ClearReleaseDate() *MovieUpdate {
 	return _u
 }
 
+// SetRating sets the "rating" field.
+func (_u *MovieUpdate) SetRating(v string) *MovieUpdate {
+	_u.mutation.SetRating(v)
+	return _u
+}
+
+// SetNillableRating sets the "rating" field if the given value is not nil.
+func (_u *MovieUpdate) SetNillableRating(v *string) *MovieUpdate {
+	if v != nil {
+		_u.SetRating(*v)
+	}
+	return _u
+}
+
+// ClearRating clears the value of the "rating" field.
+func (_u *MovieUpdate) ClearRating() *MovieUpdate {
+	_u.mutation.ClearRating()
+	return _u
+}
+
+// SetScore sets the "score" field.
+func (_u *MovieUpdate) SetScore(v float64) *MovieUpdate {
+	_u.mutation.ResetScore()
+	_u.mutation.SetScore(v)
+	return _u
+}
+
+// SetNillableScore sets the "score" field if the given value is not nil.
+func (_u *MovieUpdate) SetNillableScore(v *float64) *MovieUpdate {
+	if v != nil {
+		_u.SetScore(*v)
+	}
+	return _u
+}
+
+// AddScore adds value to the "score" field.
+func (_u *MovieUpdate) AddScore(v float64) *MovieUpdate {
+	_u.mutation.AddScore(v)
+	return _u
+}
+
+// ClearScore clears the value of the "score" field.
+func (_u *MovieUpdate) ClearScore() *MovieUpdate {
+	_u.mutation.ClearScore()
+	return _u
+}
+
 // Mutation returns the MovieMutation object of the builder.
 func (_u *MovieUpdate) Mutation() *MovieMutation {
 	return _u.mutation
@@ -260,6 +307,21 @@ func (_u *MovieUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.ReleaseDateCleared() {
 		_spec.ClearField(movie.FieldReleaseDate, field.TypeTime)
+	}
+	if value, ok := _u.mutation.Rating(); ok {
+		_spec.SetField(movie.FieldRating, field.TypeString, value)
+	}
+	if _u.mutation.RatingCleared() {
+		_spec.ClearField(movie.FieldRating, field.TypeString)
+	}
+	if value, ok := _u.mutation.Score(); ok {
+		_spec.SetField(movie.FieldScore, field.TypeFloat64, value)
+	}
+	if value, ok := _u.mutation.AddedScore(); ok {
+		_spec.AddField(movie.FieldScore, field.TypeFloat64, value)
+	}
+	if _u.mutation.ScoreCleared() {
+		_spec.ClearField(movie.FieldScore, field.TypeFloat64)
 	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -416,6 +478,53 @@ func (_u *MovieUpdateOne) ClearReleaseDate() *MovieUpdateOne {
 	return _u
 }
 
+// SetRating sets the "rating" field.
+func (_u *MovieUpdateOne) SetRating(v string) *MovieUpdateOne {
+	_u.mutation.SetRating(v)
+	return _u
+}
+
+// SetNillableRating sets the "rating" field if the given value is not nil.
+func (_u *MovieUpdateOne) SetNillableRating(v *string) *MovieUpdateOne {
+	if v != nil {
+		_u.SetRating(*v)
+	}
+	return _u
+}
+
+// ClearRating clears the value of the "rating" field.
+func (_u *MovieUpdateOne) ClearRating() *MovieUpdateOne {
+	_u.mutation.ClearRating()
+	return _u
+}
+
+// SetScore sets the "score" field.
+func (_u *MovieUpdateOne) SetScore(v float64) *MovieUpdateOne {
+	_u.mutation.ResetScore()
+	_u.mutation.SetScore(v)
+	return _u
+}
+
+// SetNillableScore sets the "score" field if the given value is not nil.
+func (_u *MovieUpdateOne) SetNillableScore(v *float64) *MovieUpdateOne {
+	if v != nil {
+		_u.SetScore(*v)
+	}
+	return _u
+}
+
+// AddScore adds value to the "score" field.
+func (_u *MovieUpdateOne) AddScore(v float64) *MovieUpdateOne {
+	_u.mutation.AddScore(v)
+	return _u
+}
+
+// ClearScore clears the value of the "score" field.
+func (_u *MovieUpdateOne) ClearScore() *MovieUpdateOne {
+	_u.mutation.ClearScore()
+	return _u
+}
+
 // Mutation returns the MovieMutation object of the builder.
 func (_u *MovieUpdateOne) Mutation() *MovieMutation {
 	return _u.mutation
@@ -543,6 +652,21 @@ func (_u *MovieUpdateOne) sqlSave(ctx context.Context) (_node *Movie, err error)
 	}
 	if _u.mutation.ReleaseDateCleared() {
 		_spec.ClearField(movie.FieldReleaseDate, field.TypeTime)
+	}
+	if value, ok := _u.mutation.Rating(); ok {
+		_spec.SetField(movie.FieldRating, field.TypeString, value)
+	}
+	if _u.mutation.RatingCleared() {
+		_spec.ClearField(movie.FieldRating, field.TypeString)
+	}
+	if value, ok := _u.mutation.Score(); ok {
+		_spec.SetField(movie.FieldScore, field.TypeFloat64, value)
+	}
+	if value, ok := _u.mutation.AddedScore(); ok {
+		_spec.AddField(movie.FieldScore, field.TypeFloat64, value)
+	}
+	if _u.mutation.ScoreCleared() {
+		_spec.ClearField(movie.FieldScore, field.TypeFloat64)
 	}
 	_node = &Movie{config: _u.config}
 	_spec.Assign = _node.assignValues

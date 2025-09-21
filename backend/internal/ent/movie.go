@@ -30,7 +30,11 @@ type Movie struct {
 	// キャスト
 	Cast string `json:"cast,omitempty"`
 	// 公開日
-	ReleaseDate  time.Time `json:"release_date,omitempty"`
+	ReleaseDate time.Time `json:"release_date,omitempty"`
+	// 評価
+	Rating string `json:"rating,omitempty"`
+	// スコア
+	Score        float64 `json:"score,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -39,9 +43,11 @@ func (*Movie) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case movie.FieldScore:
+			values[i] = new(sql.NullFloat64)
 		case movie.FieldID, movie.FieldDuration:
 			values[i] = new(sql.NullInt64)
-		case movie.FieldTitle, movie.FieldDescription, movie.FieldGenre, movie.FieldDirector, movie.FieldCast:
+		case movie.FieldTitle, movie.FieldDescription, movie.FieldGenre, movie.FieldDirector, movie.FieldCast, movie.FieldRating:
 			values[i] = new(sql.NullString)
 		case movie.FieldReleaseDate:
 			values[i] = new(sql.NullTime)
@@ -108,6 +114,18 @@ func (_m *Movie) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.ReleaseDate = value.Time
 			}
+		case movie.FieldRating:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field rating", values[i])
+			} else if value.Valid {
+				_m.Rating = value.String
+			}
+		case movie.FieldScore:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field score", values[i])
+			} else if value.Valid {
+				_m.Score = value.Float64
+			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
 		}
@@ -164,6 +182,12 @@ func (_m *Movie) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("release_date=")
 	builder.WriteString(_m.ReleaseDate.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("rating=")
+	builder.WriteString(_m.Rating)
+	builder.WriteString(", ")
+	builder.WriteString("score=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Score))
 	builder.WriteByte(')')
 	return builder.String()
 }

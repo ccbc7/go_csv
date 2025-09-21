@@ -699,6 +699,9 @@ type MovieMutation struct {
 	director      *string
 	cast          *string
 	release_date  *time.Time
+	rating        *string
+	score         *float64
+	addscore      *float64
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Movie, error)
@@ -1140,6 +1143,125 @@ func (m *MovieMutation) ResetReleaseDate() {
 	delete(m.clearedFields, movie.FieldReleaseDate)
 }
 
+// SetRating sets the "rating" field.
+func (m *MovieMutation) SetRating(s string) {
+	m.rating = &s
+}
+
+// Rating returns the value of the "rating" field in the mutation.
+func (m *MovieMutation) Rating() (r string, exists bool) {
+	v := m.rating
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRating returns the old "rating" field's value of the Movie entity.
+// If the Movie object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MovieMutation) OldRating(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRating is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRating requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRating: %w", err)
+	}
+	return oldValue.Rating, nil
+}
+
+// ClearRating clears the value of the "rating" field.
+func (m *MovieMutation) ClearRating() {
+	m.rating = nil
+	m.clearedFields[movie.FieldRating] = struct{}{}
+}
+
+// RatingCleared returns if the "rating" field was cleared in this mutation.
+func (m *MovieMutation) RatingCleared() bool {
+	_, ok := m.clearedFields[movie.FieldRating]
+	return ok
+}
+
+// ResetRating resets all changes to the "rating" field.
+func (m *MovieMutation) ResetRating() {
+	m.rating = nil
+	delete(m.clearedFields, movie.FieldRating)
+}
+
+// SetScore sets the "score" field.
+func (m *MovieMutation) SetScore(f float64) {
+	m.score = &f
+	m.addscore = nil
+}
+
+// Score returns the value of the "score" field in the mutation.
+func (m *MovieMutation) Score() (r float64, exists bool) {
+	v := m.score
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldScore returns the old "score" field's value of the Movie entity.
+// If the Movie object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MovieMutation) OldScore(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldScore is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldScore requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldScore: %w", err)
+	}
+	return oldValue.Score, nil
+}
+
+// AddScore adds f to the "score" field.
+func (m *MovieMutation) AddScore(f float64) {
+	if m.addscore != nil {
+		*m.addscore += f
+	} else {
+		m.addscore = &f
+	}
+}
+
+// AddedScore returns the value that was added to the "score" field in this mutation.
+func (m *MovieMutation) AddedScore() (r float64, exists bool) {
+	v := m.addscore
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearScore clears the value of the "score" field.
+func (m *MovieMutation) ClearScore() {
+	m.score = nil
+	m.addscore = nil
+	m.clearedFields[movie.FieldScore] = struct{}{}
+}
+
+// ScoreCleared returns if the "score" field was cleared in this mutation.
+func (m *MovieMutation) ScoreCleared() bool {
+	_, ok := m.clearedFields[movie.FieldScore]
+	return ok
+}
+
+// ResetScore resets all changes to the "score" field.
+func (m *MovieMutation) ResetScore() {
+	m.score = nil
+	m.addscore = nil
+	delete(m.clearedFields, movie.FieldScore)
+}
+
 // Where appends a list predicates to the MovieMutation builder.
 func (m *MovieMutation) Where(ps ...predicate.Movie) {
 	m.predicates = append(m.predicates, ps...)
@@ -1174,7 +1296,7 @@ func (m *MovieMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MovieMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 9)
 	if m.title != nil {
 		fields = append(fields, movie.FieldTitle)
 	}
@@ -1195,6 +1317,12 @@ func (m *MovieMutation) Fields() []string {
 	}
 	if m.release_date != nil {
 		fields = append(fields, movie.FieldReleaseDate)
+	}
+	if m.rating != nil {
+		fields = append(fields, movie.FieldRating)
+	}
+	if m.score != nil {
+		fields = append(fields, movie.FieldScore)
 	}
 	return fields
 }
@@ -1218,6 +1346,10 @@ func (m *MovieMutation) Field(name string) (ent.Value, bool) {
 		return m.Cast()
 	case movie.FieldReleaseDate:
 		return m.ReleaseDate()
+	case movie.FieldRating:
+		return m.Rating()
+	case movie.FieldScore:
+		return m.Score()
 	}
 	return nil, false
 }
@@ -1241,6 +1373,10 @@ func (m *MovieMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldCast(ctx)
 	case movie.FieldReleaseDate:
 		return m.OldReleaseDate(ctx)
+	case movie.FieldRating:
+		return m.OldRating(ctx)
+	case movie.FieldScore:
+		return m.OldScore(ctx)
 	}
 	return nil, fmt.Errorf("unknown Movie field %s", name)
 }
@@ -1299,6 +1435,20 @@ func (m *MovieMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetReleaseDate(v)
 		return nil
+	case movie.FieldRating:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRating(v)
+		return nil
+	case movie.FieldScore:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetScore(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Movie field %s", name)
 }
@@ -1310,6 +1460,9 @@ func (m *MovieMutation) AddedFields() []string {
 	if m.addduration != nil {
 		fields = append(fields, movie.FieldDuration)
 	}
+	if m.addscore != nil {
+		fields = append(fields, movie.FieldScore)
+	}
 	return fields
 }
 
@@ -1320,6 +1473,8 @@ func (m *MovieMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case movie.FieldDuration:
 		return m.AddedDuration()
+	case movie.FieldScore:
+		return m.AddedScore()
 	}
 	return nil, false
 }
@@ -1335,6 +1490,13 @@ func (m *MovieMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddDuration(v)
+		return nil
+	case movie.FieldScore:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddScore(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Movie numeric field %s", name)
@@ -1358,6 +1520,12 @@ func (m *MovieMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(movie.FieldReleaseDate) {
 		fields = append(fields, movie.FieldReleaseDate)
+	}
+	if m.FieldCleared(movie.FieldRating) {
+		fields = append(fields, movie.FieldRating)
+	}
+	if m.FieldCleared(movie.FieldScore) {
+		fields = append(fields, movie.FieldScore)
 	}
 	return fields
 }
@@ -1388,6 +1556,12 @@ func (m *MovieMutation) ClearField(name string) error {
 	case movie.FieldReleaseDate:
 		m.ClearReleaseDate()
 		return nil
+	case movie.FieldRating:
+		m.ClearRating()
+		return nil
+	case movie.FieldScore:
+		m.ClearScore()
+		return nil
 	}
 	return fmt.Errorf("unknown Movie nullable field %s", name)
 }
@@ -1416,6 +1590,12 @@ func (m *MovieMutation) ResetField(name string) error {
 		return nil
 	case movie.FieldReleaseDate:
 		m.ResetReleaseDate()
+		return nil
+	case movie.FieldRating:
+		m.ResetRating()
+		return nil
+	case movie.FieldScore:
+		m.ResetScore()
 		return nil
 	}
 	return fmt.Errorf("unknown Movie field %s", name)

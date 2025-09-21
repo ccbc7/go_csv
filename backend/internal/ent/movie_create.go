@@ -102,6 +102,34 @@ func (_c *MovieCreate) SetNillableReleaseDate(v *time.Time) *MovieCreate {
 	return _c
 }
 
+// SetRating sets the "rating" field.
+func (_c *MovieCreate) SetRating(v string) *MovieCreate {
+	_c.mutation.SetRating(v)
+	return _c
+}
+
+// SetNillableRating sets the "rating" field if the given value is not nil.
+func (_c *MovieCreate) SetNillableRating(v *string) *MovieCreate {
+	if v != nil {
+		_c.SetRating(*v)
+	}
+	return _c
+}
+
+// SetScore sets the "score" field.
+func (_c *MovieCreate) SetScore(v float64) *MovieCreate {
+	_c.mutation.SetScore(v)
+	return _c
+}
+
+// SetNillableScore sets the "score" field if the given value is not nil.
+func (_c *MovieCreate) SetNillableScore(v *float64) *MovieCreate {
+	if v != nil {
+		_c.SetScore(*v)
+	}
+	return _c
+}
+
 // Mutation returns the MovieMutation object of the builder.
 func (_c *MovieCreate) Mutation() *MovieMutation {
 	return _c.mutation
@@ -205,6 +233,14 @@ func (_c *MovieCreate) createSpec() (*Movie, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.ReleaseDate(); ok {
 		_spec.SetField(movie.FieldReleaseDate, field.TypeTime, value)
 		_node.ReleaseDate = value
+	}
+	if value, ok := _c.mutation.Rating(); ok {
+		_spec.SetField(movie.FieldRating, field.TypeString, value)
+		_node.Rating = value
+	}
+	if value, ok := _c.mutation.Score(); ok {
+		_spec.SetField(movie.FieldScore, field.TypeFloat64, value)
+		_node.Score = value
 	}
 	return _node, _spec
 }

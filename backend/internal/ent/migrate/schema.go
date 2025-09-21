@@ -41,6 +41,8 @@ var (
 		{Name: "director", Type: field.TypeString, Nullable: true},
 		{Name: "cast", Type: field.TypeString, Nullable: true},
 		{Name: "release_date", Type: field.TypeTime, Nullable: true},
+		{Name: "rating", Type: field.TypeString, Nullable: true},
+		{Name: "score", Type: field.TypeFloat64, Nullable: true},
 	}
 	// MoviesTable holds the schema information for the "movies" table.
 	MoviesTable = &schema.Table{

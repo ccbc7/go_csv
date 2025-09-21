@@ -25,6 +25,10 @@ const (
 	FieldCast = "cast"
 	// FieldReleaseDate holds the string denoting the release_date field in the database.
 	FieldReleaseDate = "release_date"
+	// FieldRating holds the string denoting the rating field in the database.
+	FieldRating = "rating"
+	// FieldScore holds the string denoting the score field in the database.
+	FieldScore = "score"
 	// Table holds the table name of the movie in the database.
 	Table = "movies"
 )
@@ -39,6 +43,8 @@ var Columns = []string{
 	FieldDirector,
 	FieldCast,
 	FieldReleaseDate,
+	FieldRating,
+	FieldScore,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -99,4 +105,14 @@ func ByCast(opts ...sql.OrderTermOption) OrderOption {
 // ByReleaseDate orders the results by the release_date field.
 func ByReleaseDate(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldReleaseDate, opts...).ToFunc()
+}
+
+// ByRating orders the results by the rating field.
+func ByRating(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRating, opts...).ToFunc()
+}
+
+// ByScore orders the results by the score field.
+func ByScore(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldScore, opts...).ToFunc()
 }

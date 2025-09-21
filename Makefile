@@ -70,27 +70,29 @@ tidy:
 ent:
 	docker-compose run --rm backend ent generate --target ./internal/ent ./internal/models
 
-# Atlasのマイグレーションの差分を生成　make atlas_diff xxx
-atlas_diff:
-	docker-compose run --rm backend atlas migrate diff $(filter-out $@,$(MAKECMDGOALS)) \
---dir "file:///./internal/database/migrations" \
-	--to "ent://./internal/models" \
+# Atlasのマイグレーションファイル生成　make atlas_migrate_diff xxx
+atlas_migrate_diff:
+	docker compose exec backend atlas migrate diff $(filter-out $@,$(MAKECMDGOALS)) \
+--dir "file://internal/database/migrations" \
+--to "ent://internal/models" \
 --dev-url "postgres://ginuser:ginpassword@postgres:5432/gin?sslmode=disable"
 
-# Atlasマイグレーション削除(※手動で削除してもvolumeを消さないとAtlasは気づかないよ)
-atlas_rm:
-	docker-compose run --rm backend atlas migrate rm \
---dir "file://internal/database/migrations"
+# Atlasマイグレーションファイルを削除,引数はマイグレーションファイル名(引数はタイムスタンプ 20250921081402のように指定)
+atlas_migrate_rm:
+	docker compose exec backend atlas migrate rm \
+--dir "file://internal/database/migrations" \
+$(filter-out $@,$(MAKECMDGOALS))
+
 
 # Atlasマイグレーション適用
-atlas_apply:
-	docker-compose run --rm backend atlas migrate apply \
+atlas_migrate_apply:
+	docker compose exec backend atlas migrate apply \
 --dir "file://internal/database/migrations" \
 --url "postgres://ginuser:ginpassword@postgres:5432/gin?sslmode=disable"
 
 # Atlasマイグレーション状態確認
-atlas_status:
-	docker-compose run --rm backend atlas migrate status \
+atlas_migrate_status:
+	docker compose exec backend atlas migrate status \
 --dir "file://internal/database/migrations" \
 --url "postgres://ginuser:ginpassword@postgres:5432/gin?sslmode=disable"
 
