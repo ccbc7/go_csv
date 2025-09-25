@@ -12,6 +12,13 @@ up:
 upd:
 	docker compose up -d
 
+upf:
+	docker compose up -d frontend
+
+upb:
+	docker compose up -d backend
+
+
 # デバッグモードで起動
 debug:
 	docker compose up -d db
