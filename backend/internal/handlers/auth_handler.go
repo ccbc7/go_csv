@@ -10,18 +10,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type IAuthHandler interface {
+type AuthHandler interface {
 	SignUp(ctx *gin.Context)
 	Login(ctx *gin.Context)
 }
 
 // サービス層のインターフェースを保持する構造体
-type AuthHandler struct {
-	service services.IAuthService
+type authHandler struct {
+	service services.AuthService
 }
 
-func NewAuthHandler(service services.IAuthService) IAuthHandler {
-	return &AuthHandler{service: service}
+func NewAuthHandler(service services.AuthService) AuthHandler {
+	return &authHandler{service: service}
 }
 
 // SignUp godoc
@@ -36,7 +36,7 @@ func NewAuthHandler(service services.IAuthService) IAuthHandler {
 //	@Failure		400		{string}	string			"bad request"
 //	@Failure		500		{string}	string			"internal server error"
 //	@Router			/auth/signup [post]
-func (h *AuthHandler) SignUp(ctx *gin.Context) {
+func (h *authHandler) SignUp(ctx *gin.Context) {
 	var input dto.SignupInput
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -64,7 +64,7 @@ func (h *AuthHandler) SignUp(ctx *gin.Context) {
 //	@Failure		400		{string}	string			"bad request"
 //	@Failure		500		{string}	string			"internal server error"
 //	@Router			/auth/login [post]
-func (h *AuthHandler) Login(ctx *gin.Context) {
+func (h *authHandler) Login(ctx *gin.Context) {
 	var input dto.LoginInput
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

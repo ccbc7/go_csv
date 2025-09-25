@@ -8,7 +8,7 @@ import (
 )
 
 // インターフェースを定義
-type IItemRepository interface {
+type ItemRepository interface {
 	FindAll() ([]*ent.Item, error)
 	FindById(itemId int, userId int) (*ent.Item, error)
 	Create(name string, price int, description string, soldOut bool, userId int) (*ent.Item, error)
@@ -17,21 +17,21 @@ type IItemRepository interface {
 }
 
 // Entクライアントを使用するリポジトリ
-type ItemEntRepository struct {
+type itemEntRepository struct {
 	client *ent.Client
 }
 
-func (r *ItemEntRepository) FindAll() ([]*ent.Item, error) {
+func (r *itemEntRepository) FindAll() ([]*ent.Item, error) {
 	return r.client.Item.Query().All(context.Background())
 }
 
-func (r *ItemEntRepository) FindById(itemId int, userId int) (*ent.Item, error) {
+func (r *itemEntRepository) FindById(itemId int, userId int) (*ent.Item, error) {
 	return r.client.Item.Query().
 		Where(item.And(item.IDEQ(itemId), item.UserIDEQ(userId))).
 		Only(context.Background())
 }
 
-func (r *ItemEntRepository) Create(name string, price int, description string, soldOut bool, userId int) (*ent.Item, error) {
+func (r *itemEntRepository) Create(name string, price int, description string, soldOut bool, userId int) (*ent.Item, error) {
 	return r.client.Item.Create().
 		SetName(name).
 		SetPrice(price).
@@ -41,7 +41,7 @@ func (r *ItemEntRepository) Create(name string, price int, description string, s
 		Save(context.Background())
 }
 
-func (r *ItemEntRepository) Update(itemId int, name string, price int, description string, soldOut bool, userId int) (*ent.Item, error) {
+func (r *itemEntRepository) Update(itemId int, name string, price int, description string, soldOut bool, userId int) (*ent.Item, error) {
 	return r.client.Item.UpdateOneID(itemId).
 		SetName(name).
 		SetPrice(price).
@@ -51,10 +51,10 @@ func (r *ItemEntRepository) Update(itemId int, name string, price int, descripti
 		Save(context.Background())
 }
 
-func (r *ItemEntRepository) Delete(itemId int, userId int) error {
+func (r *itemEntRepository) Delete(itemId int, userId int) error {
 	return r.client.Item.DeleteOneID(itemId).Exec(context.Background())
 }
 
-func NewItemRepository(client *ent.Client) IItemRepository {
-	return &ItemEntRepository{client: client}
+func NewItemRepository(client *ent.Client) ItemRepository {
+	return &itemEntRepository{client: client}
 }

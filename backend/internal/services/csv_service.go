@@ -9,23 +9,23 @@ import (
 )
 
 // インターフェースを定義
-type ICsvService interface {
+type CsvService interface {
 	ProcessCsv() error
 }
 
 // 構造体を定義
-type CsvService struct {
-	repository repositories.ICsvRepository
+type csvService struct {
+	repository repositories.CsvRepository
 	filePath   string
 }
 
 // コンストラクタを定義
-func NewCsvService(repository repositories.ICsvRepository, filePath string) ICsvService {
-	return &CsvService{repository: repository, filePath: filePath}
+func NewCsvService(repository repositories.CsvRepository, filePath string) CsvService {
+	return &csvService{repository: repository, filePath: filePath}
 }
 
 // ワーカー関数
-func worker(jobs <-chan []string, results chan<- error, repository repositories.ICsvRepository, wg *sync.WaitGroup) {
+func worker(jobs <-chan []string, results chan<- error, repository repositories.CsvRepository, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for range jobs {
 		// CSVデータの処理（現在は空の実装）
@@ -36,7 +36,7 @@ func worker(jobs <-chan []string, results chan<- error, repository repositories.
 }
 
 // CSVファイルを読み込み、リポジトリ層のCreateCsvメソッドにデータを渡す
-func (s *CsvService) ProcessCsv() error {
+func (s *csvService) ProcessCsv() error {
 	// CSVファイルを開く
 	file, err := os.Open(s.filePath)
 	if err != nil {

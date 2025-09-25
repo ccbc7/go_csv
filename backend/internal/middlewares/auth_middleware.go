@@ -10,7 +10,7 @@ import (
 )
 
 // HandlerFuncは、HTTPリクエストを処理するための関数を表す
-func AuthMiddleware(authService services.IAuthService) gin.HandlerFunc {
+func AuthMiddleware(authService services.AuthService) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		header := ctx.GetHeader("Authorization")
 		if header == "" {

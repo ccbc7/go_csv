@@ -12,21 +12,21 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type IAuthService interface {
+type AuthService interface {
 	SignUp(name, loginID, password string) error
 	Login(loginID string, password string) (*string, error)
 	GetUserFromToken(token string) (*ent.User, error)
 }
 
-type AuthService struct {
-	repository repositories.IAuthRepository
+type authService struct {
+	repository repositories.AuthRepository
 }
 
-func NewAuthService(repository repositories.IAuthRepository) IAuthService {
-	return &AuthService{repository: repository}
+func NewAuthService(repository repositories.AuthRepository) AuthService {
+	return &authService{repository: repository}
 }
 
-func (s *AuthService) SignUp(name, loginID, password string) error {
+func (s *authService) SignUp(name, loginID, password string) error {
 	// パスワードのハッシュ化
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -37,7 +37,7 @@ func (s *AuthService) SignUp(name, loginID, password string) error {
 	return err
 }
 
-func (s *AuthService) Login(loginID string, password string) (*string, error) {
+func (s *authService) Login(loginID string, password string) (*string, error) {
 	foundUser, err := s.repository.FindUser(loginID)
 	if err != nil {
 		return nil, err
@@ -76,7 +76,7 @@ func CreateToken(userId uint, loginID string) (*string, error) {
 	return &tokenString, nil
 }
 
-func (s *AuthService) GetUserFromToken(tokenString string) (*ent.User, error) {
+func (s *authService) GetUserFromToken(tokenString string) (*ent.User, error) {
 	// トークンをパースして検証
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		// 型アサーションで署名方法を確認, 型があっていない場合はエラーを返す(HS256以外の署名方法は受け付けない)

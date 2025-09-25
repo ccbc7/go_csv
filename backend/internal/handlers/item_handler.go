@@ -21,10 +21,10 @@ type ItemHandler interface {
 }
 
 type itemHandler struct {
-	service services.IItemService
+	service services.ItemService
 }
 
-func NewItemHandler(service services.IItemService) ItemHandler {
+func NewItemHandler(service services.ItemService) ItemHandler {
 	return &itemHandler{service: service}
 }
 

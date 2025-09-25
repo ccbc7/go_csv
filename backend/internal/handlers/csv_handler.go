@@ -8,10 +8,10 @@ import (
 )
 
 type CsvHandler struct {
-	services services.ICsvService
+	services services.CsvService
 }
 
-func NewCsvHandler(services services.ICsvService) *CsvHandler {
+func NewCsvHandler(services services.CsvService) *CsvHandler {
 	return &CsvHandler{services: services}
 }
 

@@ -7,7 +7,7 @@ import (
 )
 
 // インターフェースを定義
-type IItemService interface {
+type ItemService interface {
 	FindAll() ([]*ent.Item, error)
 	FindById(itemId int, userId int) (*ent.Item, error)
 	Create(createItemInput dto.CreateItemInput, userId int) (*ent.Item, error)
@@ -16,33 +16,33 @@ type IItemService interface {
 }
 
 // 構造体を定義
-type ItemService struct {
-	repository repositories.IItemRepository
+type itemService struct {
+	repository repositories.ItemRepository
 }
 
 // コンストラクタを定義
-func NewItemService(repository repositories.IItemRepository) IItemService {
-	return &ItemService{repository: repository}
+func NewItemService(repository repositories.ItemRepository) ItemService {
+	return &itemService{repository: repository}
 }
 
 // 全ての商品を取得
-func (s *ItemService) FindAll() ([]*ent.Item, error) {
+func (s *itemService) FindAll() ([]*ent.Item, error) {
 	return s.repository.FindAll()
 }
 
 // IDで商品を取得
-func (s *ItemService) FindById(itemId int, userId int) (*ent.Item, error) {
+func (s *itemService) FindById(itemId int, userId int) (*ent.Item, error) {
 	return s.repository.FindById(itemId, userId)
 }
 
 // 作成
-func (s *ItemService) Create(createItemInput dto.CreateItemInput, userId int) (*ent.Item, error) {
+func (s *itemService) Create(createItemInput dto.CreateItemInput, userId int) (*ent.Item, error) {
 	// リポジトリ層のCreateメソッドを呼び出し、作成処理を行う
 	return s.repository.Create(createItemInput.Name, int(createItemInput.Price), createItemInput.Description, false, userId)
 }
 
 // 更新
-func (s *ItemService) Update(itemId int, updateItemInput dto.UpdateItemInput, userId int) (*ent.Item, error) {
+func (s *itemService) Update(itemId int, updateItemInput dto.UpdateItemInput, userId int) (*ent.Item, error) {
 	// IDとユーザーIDで商品を取得,ユーザは自分の商品のみ更新できる
 	targetItem, err := s.FindById(itemId, userId)
 	if err != nil {
@@ -72,6 +72,6 @@ func (s *ItemService) Update(itemId int, updateItemInput dto.UpdateItemInput, us
 }
 
 // 削除
-func (s *ItemService) Delete(itemId int, userId int) error {
+func (s *itemService) Delete(itemId int, userId int) error {
 	return s.repository.Delete(itemId, userId)
 }
