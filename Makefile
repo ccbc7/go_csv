@@ -103,6 +103,19 @@ atlas_migrate_status:
 --dir "file://internal/database/migrations" \
 --url "postgres://ginuser:ginpassword@postgres:5432/gin?sslmode=disable"
 
-# 位置引数を無視するためのダミーターゲット
+
+
+#---------------devcontainer---------------
+.PHONY: d-f d-b
+
+# frontend起動
+d-f:
+	npm --prefix ./frontend run dev -- --host --port 3000
+
+# backend起動
+d-b:
+	cd backend && go run cmd/project/main.go
+
+# 位置引数を無視するためのダミーターゲット（必ず最後）
 %:
 	@:

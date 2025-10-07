@@ -1,0 +1,80 @@
+# マルチステージビルドでGoとNode.js両方をサポート
+FROM golang:1.21-bullseye as go-base
+
+# Go開発ツールをインストール
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    moreutils \
+    && rm -rf /var/lib/apt/lists/*
+
+# Go開発ツール
+RUN go install github.com/air-verse/air@latest \
+    && go install github.com/go-delve/delve/cmd/dlv@latest \
+    && go install entgo.io/ent/cmd/ent@latest \
+    && go install github.com/swaggo/swag/cmd/swag@latest \
+    && go install golang.org/x/tools/cmd/goimports@latest \
+    && go install golang.org/x/lint/golint@latest
+
+# Atlas CLI
+RUN curl -sSf https://atlasgo.sh | sh -s -- -b /usr/local/bin
+
+# Node.js環境をセットアップ
+FROM node:20-slim as node-base
+
+# Node.js開発ツール
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# 開発用のベースイメージ（Go + Node.js）
+FROM golang:1.23-bullseye
+
+# VS Code用の非rootユーザーを作成
+RUN groupadd --gid 1000 vscode
+RUN useradd --uid 1000 --gid vscode --shell /bin/bash --create-home vscode
+
+# 必要なパッケージをインストール
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    moreutils \
+    postgresql-client \
+    ca-certificates \
+    gnupg \
+    lsb-release \
+    && rm -rf /var/lib/apt/lists/*
+
+# Go開発ツールをインストール（Go 1.23互換バージョン）
+RUN go install github.com/cosmtrek/air@v1.40.4 \
+    && go install github.com/go-delve/delve/cmd/dlv@latest \
+    && go install entgo.io/ent/cmd/ent@latest \
+    && go install github.com/swaggo/swag/cmd/swag@latest \
+    && go install golang.org/x/tools/cmd/goimports@v0.10.0 \
+    && go install golang.org/x/lint/golint@latest
+
+# Atlas CLI
+RUN curl -sSf https://atlasgo.sh | sh -s -- -b /usr/local/bin
+
+# Node.js 20をインストール
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+# 作業ディレクトリを設定
+WORKDIR /workspace
+
+# ディレクトリの所有権をvscodeユーザーに変更
+RUN chown -R vscode:vscode /workspace
+
+# GoとNode.jsの環境変数を設定
+ENV GOPATH=/workspace/backend/go
+ENV PATH=/usr/local/go/bin:/workspace/backend/go/bin:$PATH
+ENV NODE_ENV=development
+
+# vscodeユーザーに切り替え
+USER vscode
+
+# シェルをbashに設定
+SHELL ["/bin/bash", "-c"]

@@ -13,5 +13,11 @@ backend/.env.test
 backend/data/
 .env
 
+# Go tools and binaries
+backend/go/bin/
+backend/go/pkg/
+
 # IDE設定ファイル
 .idea/
+frontend/node_modules
+

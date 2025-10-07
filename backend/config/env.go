@@ -8,7 +8,7 @@ import (
 
 // envファイルの読み込み
 func Initialize() {
-	err := godotenv.Load("/app/.env")
+	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
