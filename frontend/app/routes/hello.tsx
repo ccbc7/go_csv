@@ -1,6 +1,15 @@
-import type { MetaFunction } from "@remix-run/node";
-import { useState } from "react";
-import { Link } from "@remix-run/react";
+import type {
+  MetaFunction,
+  ActionFunctionArgs,
+  LoaderFunctionArgs,
+} from "@remix-run/node";
+import {
+  Link,
+  useLoaderData,
+  Form,
+  useActionData,
+  useNavigation,
+} from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -12,32 +21,48 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export default function Hello() {
-  const [response, setResponse] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
-
-  const handleHelloRequest = async () => {
-    setLoading(true);
-    setError("");
-    setResponse("");
-
-    try {
-      // バックエンドのhelloエンドポイントにアクセス
-      const res = await fetch("http://localhost:8080/api/v1/hello");
-
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-
-      const data = await res.text();
-      setResponse(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "エラーが発生しました");
-    } finally {
-      setLoading(false);
+// サーバーサイドでデータを取得
+export async function loader({ request }: LoaderFunctionArgs) {
+  try {
+    const response = await fetch("http://backend:8080/api/v1/hello");
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-  };
+    const data = await response.text();
+    return { helloData: data, error: null };
+  } catch (error) {
+    return {
+      helloData: null,
+      error: error instanceof Error ? error.message : "エラーが発生しました",
+    };
+  }
+}
+
+// フォーム送信時の処理
+export async function action({ request }: ActionFunctionArgs) {
+  try {
+    const response = await fetch("http://backend:8080/api/v1/hello");
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.text();
+    return { result: data, error: null };
+  } catch (error) {
+    return {
+      result: null,
+      error: error instanceof Error ? error.message : "エラーが発生しました",
+    };
+  }
+}
+
+export default function Hello() {
+  // loaderからデータを取得
+  const { helloData, error: loaderError } = useLoaderData<typeof loader>();
+  // actionの結果を取得
+  const actionData = useActionData<typeof action>();
+  // ナビゲーション状態（ローディング状態）
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
 
   return (
     <div className="min-h-screen bg-white">
@@ -96,53 +121,87 @@ export default function Hello() {
               下のボタンをクリックして、バックエンドのhelloエンドポイントからレスポンスを取得します
             </p>
 
-            <button
-              onClick={handleHelloRequest}
-              disabled={loading}
-              className={`px-8 py-4 rounded-lg font-light tracking-wide transition-all duration-300 ${
-                loading
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-gradient-to-r from-amber-400 to-yellow-500 text-white hover:from-amber-500 hover:to-yellow-600 shadow-lg hover:shadow-xl transform hover:scale-105"
-              }`}
-            >
-              {loading ? (
-                <div className="flex items-center">
-                  <svg
-                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-500"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  リクエスト中...
-                </div>
-              ) : (
-                "Hello API を呼び出す"
-              )}
-            </button>
+            <Form method="post">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={`px-8 py-4 rounded-lg font-light tracking-wide transition-all duration-300 ${
+                  isSubmitting
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-gradient-to-r from-amber-400 to-yellow-500 text-white hover:from-amber-500 hover:to-yellow-600 shadow-lg hover:shadow-xl transform hover:scale-105"
+                }`}
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center">
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-gray-500"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    リクエスト中...
+                  </div>
+                ) : (
+                  "Hello API を呼び出す"
+                )}
+              </button>
+            </Form>
           </div>
 
-          {/* レスポンス表示エリア */}
-          {(response || error) && (
+          {/* Loader結果表示 */}
+          {helloData && (
             <div className="mt-8">
               <h4 className="text-lg font-light text-gray-800 mb-4 tracking-wide">
-                レスポンス結果
+                初期読み込み結果 (Loader)
+              </h4>
+              <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+                <div className="flex items-center mb-2">
+                  <svg
+                    className="w-5 h-5 text-green-500 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <span className="text-green-800 font-medium">成功</span>
+                </div>
+                <div className="bg-white rounded-lg p-4 mt-3 border border-green-100">
+                  <code className="text-green-800 font-mono text-lg">
+                    {helloData}
+                  </code>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Action結果表示 */}
+          {actionData && (
+            <div className="mt-8">
+              <h4 className="text-lg font-light text-gray-800 mb-4 tracking-wide">
+                フォーム送信結果 (Action)
               </h4>
 
-              {error ? (
+              {actionData.error ? (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-6">
                   <div className="flex items-center mb-2">
                     <svg
@@ -153,14 +212,14 @@ export default function Hello() {
                     >
                       <path
                         strokeLinecap="round"
-                        stroke-linejoin="round"
+                        strokeLinejoin="round"
                         strokeWidth={2}
                         d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                       />
                     </svg>
                     <span className="text-red-800 font-medium">エラー</span>
                   </div>
-                  <p className="text-red-700 font-light">{error}</p>
+                  <p className="text-red-700 font-light">{actionData.error}</p>
                 </div>
               ) : (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-6">
@@ -182,11 +241,39 @@ export default function Hello() {
                   </div>
                   <div className="bg-white rounded-lg p-4 mt-3 border border-green-100">
                     <code className="text-green-800 font-mono text-lg">
-                      {response}
+                      {actionData.result}
                     </code>
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Loaderエラー表示 */}
+          {loaderError && (
+            <div className="mt-8">
+              <h4 className="text-lg font-light text-gray-800 mb-4 tracking-wide">
+                初期読み込みエラー (Loader)
+              </h4>
+              <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+                <div className="flex items-center mb-2">
+                  <svg
+                    className="w-5 h-5 text-red-500 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <span className="text-red-800 font-medium">エラー</span>
+                </div>
+                <p className="text-red-700 font-light">{loaderError}</p>
+              </div>
             </div>
           )}
 
@@ -210,6 +297,41 @@ export default function Hello() {
                 <div className="flex items-center">
                   <span className="text-gray-500 w-20">Response:</span>
                   <span className="text-gray-800">&quot;helloworld&quot;</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Remixの特徴説明 */}
+          <div className="mt-8 pt-8 border-t border-amber-200">
+            <h4 className="text-lg font-light text-gray-800 mb-4 tracking-wide">
+              Remixの特徴
+            </h4>
+            <div className="bg-white rounded-lg p-6 border border-amber-100">
+              <div className="space-y-4 text-sm">
+                <div className="flex items-start">
+                  <span className="text-amber-600 font-medium w-20">
+                    Loader:
+                  </span>
+                  <span className="text-gray-700">
+                    ページ読み込み時にサーバーサイドでデータを取得
+                  </span>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-amber-600 font-medium w-20">
+                    Action:
+                  </span>
+                  <span className="text-gray-700">
+                    フォーム送信時にサーバーサイドで処理
+                  </span>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-amber-600 font-medium w-20">
+                    useState:
+                  </span>
+                  <span className="text-gray-700">
+                    不要！サーバーサイドで状態管理
+                  </span>
                 </div>
               </div>
             </div>
