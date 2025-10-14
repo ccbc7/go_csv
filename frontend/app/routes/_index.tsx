@@ -1,5 +1,6 @@
 import type { MetaFunction } from "@remix-run/node";
 import { useState, useEffect } from "react";
+import { Link } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -49,7 +50,7 @@ function Slideshow() {
     if (!isAutoPlay) return;
 
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slideImages.length);
+      setCurrentSlide(prev => (prev + 1) % slideImages.length);
     }, 4000); // 4秒間隔
 
     return () => clearInterval(interval);
@@ -228,13 +229,20 @@ export default function Index() {
 
             {/* デスクトップ用ナビゲーション */}
             <nav className="hidden md:flex space-x-8">
-              <a
-                href="/"
+              <Link
+                to="/"
                 className="text-gray-600 hover:text-amber-600 transition-colors font-light tracking-wide relative group"
               >
                 ホーム
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-400 transition-all duration-300 group-hover:w-full"></span>
-              </a>
+              </Link>
+              <Link
+                to="/hello"
+                className="text-gray-600 hover:text-amber-600 transition-colors font-light tracking-wide relative group"
+              >
+                Hello
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-400 transition-all duration-300 group-hover:w-full"></span>
+              </Link>
               <a
                 href="/gallery"
                 className="text-gray-600 hover:text-amber-600 transition-colors font-light tracking-wide relative group"
@@ -263,13 +271,20 @@ export default function Index() {
           {isMenuOpen && (
             <nav className="md:hidden mt-6 pt-6 border-t border-amber-100">
               <div className="space-y-4">
-                <a
-                  href="/"
+                <Link
+                  to="/"
                   className="block text-gray-600 hover:text-amber-600 transition-colors py-2 font-light tracking-wide"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   ホーム
-                </a>
+                </Link>
+                <Link
+                  to="/hello"
+                  className="block text-gray-600 hover:text-amber-600 transition-colors py-2 font-light tracking-wide"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Hello
+                </Link>
                 <a
                   href="/gallery"
                   className="block text-gray-600 hover:text-amber-600 transition-colors py-2 font-light tracking-wide"
@@ -311,7 +326,7 @@ export default function Index() {
         {/* 洗練されたカテゴリフィルター */}
         <div className="mb-10 md:mb-16">
           <div className="flex flex-wrap gap-3 md:gap-4 justify-center">
-            {categories.map((category) => (
+            {categories.map(category => (
               <button
                 key={category}
                 className={`px-5 py-2.5 md:px-6 md:py-3 rounded-full text-sm md:text-base font-light transition-all duration-300 tracking-wide ${
@@ -328,7 +343,7 @@ export default function Index() {
 
         {/* 記事一覧 */}
         <div className="space-y-4 md:space-y-12">
-          {blogPosts.map((post) => (
+          {blogPosts.map(post => (
             <article
               key={post.id}
               className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg hover:border-amber-100 transition-all duration-300 group"
@@ -338,9 +353,9 @@ export default function Index() {
                   <div className="flex items-center text-sm text-gray-500 space-x-4 font-light">
                     <time>{post.date}</time>
                     <span className="text-amber-300">•</span>
-                  <span className="inline-block px-4 py-2 text-sm font-light text-amber-700 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-full w-fit border border-amber-100">
-                    {post.category}
-                  </span>
+                    <span className="inline-block px-4 py-2 text-sm font-light text-amber-700 bg-gradient-to-r from-amber-50 to-yellow-50 rounded-full w-fit border border-amber-100">
+                      {post.category}
+                    </span>
                   </div>
                 </div>
 

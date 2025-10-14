@@ -1,0 +1,11 @@
+{
+  "remote.containers.defaultExtensions": [
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "bradlc.vscode-tailwindcss",
+    "ms-vscode.vscode-typescript-next"
+  ],
+  "remote.containers.workspaceFolder": "/app",
+  "remote.containers.dockerComposeFile": "../compose.yaml",
+  "remote.containers.service": "frontend"
+}
