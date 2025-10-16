@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 
 	"project/internal/services"
@@ -65,20 +66,34 @@ func (h *authHandler) SignUp(ctx *gin.Context) {
 //	@Failure		500		{string}	string			"internal server error"
 //	@Router			/auth/login [post]
 func (h *authHandler) Login(ctx *gin.Context) {
+	log.Printf("=== LOGIN REQUEST START ===")
+
 	var input dto.LoginInput
 	if err := ctx.ShouldBindJSON(&input); err != nil {
+		log.Printf("❌ JSON binding failed: %v", err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
+	log.Printf("📧 Received email: %s", input.Email)
+	log.Printf("🔒 Password length: %d", len(input.Password))
+
 	token, err := h.service.Login(input.Email, input.Password)
 	if err != nil {
+		log.Printf("❌ Login service failed: %v", err)
 		if err.Error() == "user not found" {
+			log.Printf("👤 User not found for email: %s", input.Email)
 			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 			return
 		}
+		log.Printf("💥 Internal error: %v", err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	log.Printf("✅ Login successful for email: %s", input.Email)
+	log.Printf("🎫 Token generated: %s...", (*token)[:20])
+	log.Printf("=== LOGIN REQUEST END ===")
+
 	ctx.JSON(http.StatusOK, gin.H{"token": token})
 }
