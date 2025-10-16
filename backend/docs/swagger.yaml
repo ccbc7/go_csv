@@ -211,6 +211,28 @@ paths:
       summary: Create a new user
       tags:
       - auth
+  /auth/verify:
+    post:
+      consumes:
+      - application/json
+      description: Verify JWT token and return user info
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: user info
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: unauthorized
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Verify a token
+      tags:
+      - auth
   /hello:
     get:
       consumes:

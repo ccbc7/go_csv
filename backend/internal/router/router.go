@@ -59,6 +59,7 @@ func SetupRouter(client *ent.Client) *gin.Engine {
 
 		authRouter.POST("/signup", authHandler.SignUp)
 		authRouter.POST("/login", authHandler.Login)
+		authRouter.POST("/verify", authHandler.Verify)
 
 		csvRouter.POST("/process", csvHandler.ProcessCsv)
 	}

@@ -3,6 +3,7 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"strings"
 
 	"project/internal/services"
 
@@ -14,6 +15,7 @@ import (
 type AuthHandler interface {
 	SignUp(ctx *gin.Context)
 	Login(ctx *gin.Context)
+	Verify(ctx *gin.Context)
 }
 
 // サービス層のインターフェースを保持する構造体
@@ -96,4 +98,54 @@ func (h *authHandler) Login(ctx *gin.Context) {
 	log.Printf("=== LOGIN REQUEST END ===")
 
 	ctx.JSON(http.StatusOK, gin.H{"token": token})
+}
+
+// Verify godoc
+//
+//	@Summary		Verify a token
+//	@Description	Verify JWT token and return user info
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Success		200	{object}	map[string]interface{}	"user info"
+//	@Failure		401	{string}	string					"unauthorized"
+//	@Router			/auth/verify [post]
+func (h *authHandler) Verify(ctx *gin.Context) {
+	log.Printf("=== VERIFY REQUEST START ===")
+
+	header := ctx.GetHeader("Authorization")
+	if header == "" {
+		log.Printf("❌ No Authorization header")
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header required"})
+		return
+	}
+
+	// Bearerトークンのチェック
+	if !strings.HasPrefix(header, "Bearer ") {
+		log.Printf("❌ Invalid Authorization header format")
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token format"})
+		return
+	}
+
+	tokenString := strings.TrimPrefix(header, "Bearer ")
+	log.Printf("🔍 Verifying token: %s...", tokenString[:20])
+
+	// トークンからユーザー情報を取得
+	user, err := h.service.GetUserFromToken(tokenString)
+	if err != nil {
+		log.Printf("❌ Token verification failed: %v", err)
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+		return
+	}
+
+	log.Printf("✅ Token verified successfully for user: %s", user.LoginID)
+	log.Printf("=== VERIFY REQUEST END ===")
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"user_id":  user.ID,
+		"login_id": user.LoginID,
+		"name":     user.Name,
+		"valid":    true,
+	})
 }

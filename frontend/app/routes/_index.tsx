@@ -243,6 +243,13 @@ export default function Index() {
                 Hello
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-400 transition-all duration-300 group-hover:w-full"></span>
               </Link>
+              <Link
+                to="/management/auth"
+                className="text-gray-600 hover:text-amber-600 transition-colors font-light tracking-wide relative group"
+              >
+                管理者
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-400 transition-all duration-300 group-hover:w-full"></span>
+              </Link>
               <a
                 href="/gallery"
                 className="text-gray-600 hover:text-amber-600 transition-colors font-light tracking-wide relative group"
@@ -284,6 +291,13 @@ export default function Index() {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Hello
+                </Link>
+                <Link
+                  to="/management/auth"
+                  className="block text-gray-600 hover:text-amber-600 transition-colors py-2 font-light tracking-wide"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  管理者
                 </Link>
                 <a
                   href="/gallery"
