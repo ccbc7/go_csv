@@ -35,6 +35,34 @@
         "showLog": true,
         "trace": "verbose",
         "apiVersion": 2
+      },
+      {
+        "name": "Debug Remix App (Docker)",
+        "type": "node",
+        "request": "attach",
+        "port": 9229,
+        "address": "localhost",
+        "localRoot": "${workspaceFolder}/frontend",
+        "remoteRoot": "/app",
+        "restart": true,
+        "skipFiles": [
+          "<node_internals>/**",
+          "/app/node_modules/**"
+        ],
+        "sourceMaps": true
+      },
+      {
+        "name": "Attach to Remix Dev Server",
+        "type": "node",
+        "request": "attach",
+        "port": 9229,
+        "restart": true,
+        "localRoot": "${workspaceFolder}/frontend",
+        "remoteRoot": "${workspaceFolder}/frontend",
+        "skipFiles": [
+          "<node_internals>/**",
+          "${workspaceFolder}/frontend/node_modules/**"
+        ]
       }
   ]
 }
