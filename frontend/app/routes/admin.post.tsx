@@ -87,26 +87,38 @@ export default function AdminPost() {
               </p>
             </div>
 
-            {/* 管理者権限表示 */}
-            <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-2">
-              <div className="flex items-center">
-                <svg
-                  className="w-5 h-5 text-red-500 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                  />
-                </svg>
-                <span className="text-red-800 text-sm font-medium">
-                  管理者権限
-                </span>
+            {/* 管理者権限表示とログアウトボタン */}
+            <div className="flex items-center space-x-4">
+              <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-2">
+                <div className="flex items-center">
+                  <svg
+                    className="w-5 h-5 text-red-500 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                    />
+                  </svg>
+                  <span className="text-red-800 text-sm font-medium">
+                    管理者権限
+                  </span>
+                </div>
               </div>
+
+              {/* ログアウトボタン */}
+              <Form method="post" action="/logout">
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors"
+                >
+                  ログアウト
+                </button>
+              </Form>
             </div>
           </div>
         </div>

@@ -4,22 +4,28 @@ import type {
   LoaderFunctionArgs,
 } from "@remix-run/node";
 import { Form, useActionData, useNavigation, redirect } from "@remix-run/react";
+import { getTokenFromCookie, authCookie } from "~/utils/auth.server";
 
-export const meta: MetaFunction = () => {
-  return [
-    { title: "管理者ログイン - ArtWork" },
-    {
-      name: "description",
-      content: "管理者認証ページ",
-    },
-  ];
-};
+/**
+ * 管理者ログインページのメタデータ
+ * @returns 管理者ログインページのメタデータ
+ */
+export const meta: MetaFunction = () => [
+  { title: "管理者ログイン - ArtWork" },
+  {
+    name: "description",
+    content: "管理者認証ページ",
+  },
+];
 
-// サーバーサイドで認証状態をチェック
+/**
+ * サーバーサイドで認証状態をチェック
+ * @param request
+ * @returns 認証が成功した場合はリダイレクト, 失敗した場合はnull
+ */
 export async function loader({ request }: LoaderFunctionArgs) {
   // 既にログインしている場合は管理者ダッシュボードにリダイレクト
-  const url = new URL(request.url);
-  const token = url.searchParams.get("token");
+  const token = await getTokenFromCookie(request);
 
   if (token) {
     // JWTトークンが有効かチェック
@@ -43,7 +49,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return null;
 }
 
-// ログインフォーム送信時の処理
+/**
+ * ログインフォーム送信時の処理
+ * @param request
+ * @returns ログインが成功した場合はリダイレクト, 失敗した場合はエラー
+ */
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const email = formData.get("email") as string;
@@ -94,8 +104,12 @@ export async function action({ request }: ActionFunctionArgs) {
 
     // JWTトークンを取得
     if (data.token) {
-      // 管理者ダッシュボードにリダイレクト（トークンをクエリパラメータで渡す）
-      return redirect(`/admin/dashboard?token=${data.token}`);
+      // クッキーにトークンを設定して管理者ダッシュボードにリダイレクト
+      return redirect("/admin/dashboard", {
+        headers: {
+          "Set-Cookie": await authCookie.serialize(data.token),
+        },
+      });
     }
 
     return {
@@ -113,6 +127,11 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 }
 
+/**
+ * 管理者ログインページ
+ * @returns 管理者ログインページ
+ * @description 管理者ログインページは、管理者ログインフォームを表示する
+ */
 export default function ManagementAuth() {
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
