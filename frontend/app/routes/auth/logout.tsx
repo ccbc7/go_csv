@@ -5,7 +5,7 @@ import { authCookie } from "~/utils/auth.server";
 // ログアウト処理
 export async function action({ request }: ActionFunctionArgs) {
   // クッキーを削除してログインページにリダイレクト
-  return redirect("/management/auth", {
+  return redirect("/auth/login", {
     headers: {
       "Set-Cookie": await authCookie.serialize("", {
         maxAge: 0, // 即座に期限切れにする
@@ -16,5 +16,5 @@ export async function action({ request }: ActionFunctionArgs) {
 
 // GETリクエストでもログアウトできるようにする
 export async function loader() {
-  return redirect("/management/auth");
+  return redirect("/auth/login");
 }
