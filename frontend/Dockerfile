@@ -11,11 +11,8 @@ RUN npm cache clean --force && npm install --include=dev
 # アプリケーションファイルをコピー
 COPY . .
 
-# ファイルの所有者をnodeユーザーに変更
-RUN chown -R node:node /app
-
-# nodeユーザーに切り替え
-USER node
+# 開発環境用：ファイル権限を777に設定
+RUN chmod -R 777 /app
 
 # ポート3000と9229を公開
 EXPOSE 3000 9229
