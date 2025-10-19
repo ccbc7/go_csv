@@ -22,3 +22,5 @@ ENV NODE_ENV=development
 
 # 開発サーバーを起動（デバッグモードで実行）
 CMD ["node", "--inspect=0.0.0.0:9229", "./node_modules/@remix-run/dev/dist/cli.js", "vite:dev", "--host", "--port", "3000"]
+
+ENTRYPOINT ["/entrypoint.sh"]
