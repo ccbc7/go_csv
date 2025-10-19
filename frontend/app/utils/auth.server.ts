@@ -90,13 +90,13 @@ export async function requireAuth(request: LoaderFunctionArgs["request"]) {
 
   if (!token) {
     console.log("🔒 No token found, redirecting to login");
-    throw redirect("/management/auth");
+    throw redirect("/auth/login");
   }
 
   const isValid = await verifyToken(token);
   if (!isValid) {
     console.log("❌ Invalid token, redirecting to login");
-    throw redirect("/management/auth");
+    throw redirect("/auth/login");
   }
 
   console.log("✅ Token verified successfully");
@@ -113,13 +113,13 @@ export async function requireAdmin(request: LoaderFunctionArgs["request"]) {
 
   if (!token) {
     console.log("🔒 No token found, redirecting to login");
-    throw redirect("/management/auth");
+    throw redirect("/auth/login");
   }
 
   const isValid = await verifyToken(token);
   if (!isValid) {
     console.log("❌ Invalid token, redirecting to login");
-    throw redirect("/management/auth");
+    throw redirect("/auth/login");
   }
 
   const isAdmin = await checkAdminRole(token);
